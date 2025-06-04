@@ -13,7 +13,11 @@ import JobFilter from "./JobPortal/JobFilter";
 import JobDetails from "./JobPortal/JobDetails";
 import UserProfile from "./Profile/UserProfile";
 import NotFound from "./NotFound/NotFound";
+import MainProfile from "./Profile/MainProfile";
 import WatchList from "./Profile/WatchList";
+import Dummy from "./ProfileDetails/Dummy";
+import BookMark from "./Profile/BookMark";
+import RecentlyViewed from "./Profile/RecentlyViewed";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -33,7 +37,11 @@ function App() {
           <Route path="/job-filter" element={<JobFilter />} />
           <Route path="/job-details" element={<JobDetails />} />
           <Route path="/user-profile" element={<UserProfile />} />
+          <Route path="/main-profile" element={<MainProfile />} />
           <Route path="*" element={<NotFound />} />
+          <Route path="/dummy" element={<Dummy />} />
+          <Route path="/recently-viewed" element={<RecentlyViewed />} />
+          <Route path="/bookmark" element={<BookMark />} />
           <Route path="/watchlist" element={<WatchList />} />
         </Routes>
       </BrowserRouter>
