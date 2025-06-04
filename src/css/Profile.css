@@ -1,0 +1,466 @@
+/* Base Styles */
+.profile-layout {
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+/* Sidebar Styles */
+.profile-layout .profile-sider {
+  background: #fff;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  z-index: 10;
+}
+
+.profile-layout .ant-menu-title-content {
+  text-align: left;
+}
+
+.profile-layout .profile-card-sidebar {
+  padding: 24px;
+  text-align: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.profile-layout .profile-avatar {
+  margin: 0 auto;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.profile-layout .profile-name {
+  margin: 16px 0 4px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.profile-layout .profile-email {
+  margin: 0;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.profile-layout .profile-completion {
+  margin-top: 16px;
+}
+
+.profile-layout .progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.profile-layout .profile-progress {
+  margin-bottom: 0;
+}
+
+.profile-layout .profile-menu {
+  border-right: none;
+  padding: 8px 10px;
+}
+
+.profile-layout .profile-menu .ant-menu-item {
+  height: 48px;
+  margin: 4px 8px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.profile-menu .ant-menu-item:hover {
+  background-color: #e9e0fe;
+}
+
+.profile-menu .ant-menu-item-selected {
+  background-color: #e9e0fe;
+  color: #5f2eea;
+  font-weight: 500;
+}
+
+/* Main Content Styles */
+.profile-content-layout {
+  transition: all 0.2s;
+  margin-left: 24px;
+}
+
+.profile-sider.collapsed + .profile-content-layout {
+  margin-left: 80px;
+}
+
+.profile-banner {
+  height: 200px;
+  padding: 0;
+  background: linear-gradient(135deg, #7c25eb 0%, #481eaf 100%);
+  position: relative;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.banner-content {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.edit-banner-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #fff;
+  color: #2563eb;
+}
+
+.profile-main-content {
+  padding: 24px;
+  margin-top: -80px;
+}
+
+/* Profile Header Card */
+.profile-header-card {
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: none;
+}
+
+.profile-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profile-header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.main-profile-avatar {
+  border: 4px solid #fff;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.profile-header-info {
+  text-align: left;
+}
+
+.profile-header-info h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.username {
+  margin: 4px 0 8px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.profile-tags .ant-tag {
+  margin-right: 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 2px 8px;
+}
+
+.profile-header-actions .ant-btn-circle {
+  width: 36px;
+  height: 36px;
+}
+
+/* Profile Sections */
+.profile-sections {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.profile-section-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: none;
+}
+
+.profile-section-card .ant-card-head {
+  border-bottom: none;
+  padding: 16px 24px 3px 24px;
+  text-align: left;
+}
+
+.profile-section-card .ant-card-head-title {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.profile-section-card .ant-card-extra {
+  padding: 0;
+}
+
+.profile-section-card .ant-card-body {
+  padding: 0 24px 24px;
+  text-align: left;
+}
+
+.profile-section-description {
+  color: #64748b;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+/* Resume Card */
+.resume-card {
+  background-color: #e9e0fe;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: left;
+}
+
+.ant-layout-sider .ant-layout-sider-trigger {
+  background: #5f2eea;
+  display: none;
+}
+
+.resume-card-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #5f2eea;
+}
+
+.resume-card-description {
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.upload-resume-btn {
+  background: #5f2eea;
+  border-color: #5f2eea;
+}
+
+/* Rankings Card */
+.rankings-card .ant-card-head {
+  padding: 16px 16px 0;
+}
+
+.stats-container {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.stat-item {
+  flex: 1;
+  text-align: center;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.badges-container {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.badge-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.gold-badge {
+  background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+  color: #92400e;
+}
+
+.silver-badge {
+  background: linear-gradient(135deg, #e5e7eb 0%, #9ca3af 100%);
+  color: #4b5563;
+}
+
+.skills_card {
+  display: flex;
+  justify-content: space-between;
+}
+
+.userprofile_cards {
+  padding: 28px 24px 16px 24px;
+  background: #fff;
+}
+
+.userprofile_cards img {
+  width: 65%;
+}
+
+.userprofile_cards h3 {
+  font-size: 18px;
+}
+
+.userprofile_social svg {
+  background: #eee;
+  height: 40px;
+  padding: 9px;
+  border-radius: 30px;
+  width: 50px;
+  cursor: no-drop;
+  opacity: 0.7;
+}
+
+.userprofile_social {
+  padding-top: 12px;
+  display: flex;
+  justify-content: left;
+  gap: 20px;
+}
+
+.react-calendar-heatmap {
+  background-color: transparent;
+  border-radius: 8px;
+}
+
+.react-calendar-heatmap text {
+  fill: rgba(255, 255, 255, 0.7);
+  font-size: 10px;
+}
+
+.react-calendar-heatmap .color-empty {
+  fill: rgba(255, 255, 255, 0.05);
+  rx: 4px;
+  ry: 4px;
+}
+
+.react-calendar-heatmap .color-scale-1 {
+  fill: #4361ee;
+  rx: 4px;
+  ry: 4px;
+}
+
+.react-calendar-heatmap .color-scale-2 {
+  fill: #3a0ca3;
+  rx: 4px;
+  ry: 4px;
+}
+
+.react-calendar-heatmap .color-scale-3 {
+  fill: #f72585;
+  rx: 4px;
+  ry: 4px;
+}
+
+.loading-pulse {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #4361ee;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+}
+
+.ant-menu-item-selected {
+  background-color: #e9e0fe !important;
+  color: #5f2eea !important;
+  font-weight: 700;
+}
+
+.ant-progress .ant-progress-bg {
+  background: #5f2eea !important;
+}
+
+.drawer_skills .ant-tag .ant-tag-close-icon {
+  color: #5f2eea !important;
+  margin-left: 6px !important;
+}
+
+.user_details_drawer .ant-form-item {
+  margin-bottom: 10px;
+}
+
+.ant-upload-wrapper
+  .ant-upload-list
+  .ant-upload-list-item-error
+  .ant-upload-icon
+  .anticon {
+  color: #0fa114 !important;
+}
+
+.ant-upload-wrapper .ant-upload-drag:not(.ant-upload-disabled):hover {
+  border-color: #5f2eea !important;
+}
+
+.resume_upload {
+  position: absolute;
+  z-index: 9;
+  opacity: 0;
+  width: 20%;
+  cursor: pointer;
+}
+/* Responsive Styles */
+@media (max-width: 992px) {
+  .profile-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .profile-header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-content-layout {
+    margin-left: 0;
+  }
+
+  .profile-sider {
+    position: fixed;
+    height: 100vh;
+    z-index: 100;
+  }
+
+  .profile-sider.collapsed + .profile-content-layout {
+    margin-left: 0;
+  }
+}
