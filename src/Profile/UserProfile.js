@@ -10,13 +10,17 @@ import { FaRegBookmark } from "react-icons/fa";
 import { FaUserPen } from "react-icons/fa6";
 import { FaRegHeart } from "react-icons/fa";
 import { FaListOl } from "react-icons/fa";
+import { FcApproval } from "react-icons/fc";
 import WatchList from "./WatchList";
 import RecentlyViewed from "./RecentlyViewed";
 import MainProfile from "./MainProfile";
-
+import Settings from "./Settings";
 import "react-calendar-heatmap/dist/styles.css";
+import ProSubscription from "./ProSubscription";
 import TextArea from "antd/es/input/TextArea";
 import BookMark from "./BookMark";
+import Listing from "./Listing";
+import AccountSettings from "./AccountSettings";
 const { Title, Text } = Typography;
 const { Dragger } = Upload;
 
@@ -27,10 +31,19 @@ const menuItems = [
   { key: "watchlist", icon: <FaRegHeart />, label: "Watchlist" },
   { key: "bookmarked", icon: <FaRegBookmark />, label: "Bookmarked Jobs" },
   { key: "viewed", icon: <ClockCircleOutlined />, label: "Recently Viewed" },
-  { key: "4", icon: <SafetyCertificateOutlined />, label: "Certificates" },
-  { key: "5", icon: <SettingOutlined />, label: "Settings" },
-  { key: "6", icon: <FaListOl />, label: "Manage Listing" },
-  { key: "7", icon: <SettingOutlined />, label: "Account Settings" },
+  {
+    key: "certificates",
+    icon: <SafetyCertificateOutlined />,
+    label: "Certificates",
+  },
+  { key: "settings", icon: <SettingOutlined />, label: "Settings" },
+  { key: "listing", icon: <FaListOl />, label: "Manage Listing" },
+  {
+    key: "accountsettings",
+    icon: <SettingOutlined />,
+    label: "Account Settings",
+  },
+  { key: "prosubscription", icon: <FcApproval />, label: "Pro Subscription" },
 ];
 
 const siderStyle = {
@@ -233,6 +246,14 @@ export default function UserProfile() {
             <BookMark />
           ) : sideBar === "viewed" ? (
             <RecentlyViewed />
+          ) : sideBar === "settings" ? (
+            <Settings />
+          ) : sideBar === "listing" ? (
+            <Listing />
+          ) : sideBar === "accountsettings" ? (
+            <AccountSettings />
+          ) : sideBar === "prosubscription" ? (
+            <ProSubscription />
           ) : (
             ""
           )}

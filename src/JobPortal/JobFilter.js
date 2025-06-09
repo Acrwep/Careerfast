@@ -45,6 +45,7 @@ import {
 import "../css/JobFilter.css";
 import { FaLocationDot } from "react-icons/fa6";
 import { FaRegCalendarAlt } from "react-icons/fa";
+import CommonSelectField from "../Common/CommonSelectField";
 
 const { Title, Text, Link } = Typography;
 const jobs = [
@@ -728,9 +729,7 @@ export default function JobFilter() {
               </Space>
             </Button>
           ) : (
-            <Select
-              placeholder="Select Salary Filter"
-              onChange={handleChange}
+            <CommonSelectField
               style={{
                 border: "1px solid rgba(0, 0, 0, 0.08)",
                 background: "#fff",
@@ -739,7 +738,11 @@ export default function JobFilter() {
                 borderRadius: 20,
                 color: "#2d3748",
                 fontWeight: 500,
+                marginBottom: 0,
               }}
+              name="experiencemonth"
+              onChange={handleChange}
+              placeholder="Select Salary Filter"
               options={[
                 {
                   id: 1,
@@ -750,7 +753,8 @@ export default function JobFilter() {
                   label: "Salary (Low to High)",
                 },
               ]}
-            ></Select>
+              showSearch={true}
+            />
           )}
         </>
 

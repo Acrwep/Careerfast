@@ -16,8 +16,12 @@ import NotFound from "./NotFound/NotFound";
 import MainProfile from "./Profile/MainProfile";
 import WatchList from "./Profile/WatchList";
 import Dummy from "./ProfileDetails/Dummy";
+import Settings from "./Profile/Settings";
 import BookMark from "./Profile/BookMark";
 import RecentlyViewed from "./Profile/RecentlyViewed";
+import Listing from "./Profile/Listing";
+import AccountSettings from "./Profile/AccountSettings";
+import ProSubscription from "./Profile/ProSubscription";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -40,9 +44,13 @@ function App() {
           <Route path="/main-profile" element={<MainProfile />} />
           <Route path="*" element={<NotFound />} />
           <Route path="/dummy" element={<Dummy />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/recently-viewed" element={<RecentlyViewed />} />
           <Route path="/bookmark" element={<BookMark />} />
           <Route path="/watchlist" element={<WatchList />} />
+          <Route path="/listing" element={<Listing />} />
+          <Route path="/accountsetting" element={<AccountSettings />} />
+          <Route path="/pro-subscription" element={<ProSubscription />} />
         </Routes>
       </BrowserRouter>
       <ToastContainer

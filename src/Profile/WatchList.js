@@ -25,6 +25,7 @@ import {
   DownOutlined,
 } from "@ant-design/icons";
 import { CommonToaster } from "../Common/CommonToaster";
+import CommonSelectField from "../Common/CommonSelectField";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -224,7 +225,7 @@ const OpportunityCard = ({ opportunity, onSave }) => {
   );
 };
 
-const WatchList = () => {
+export default function WatchList() {
   const [activeTab, setActiveTab] = useState("0");
   const [opportunities, setOpportunities] = useState(mockOpportunities);
   const [searchQuery, setSearchQuery] = useState("");
@@ -253,7 +254,6 @@ const WatchList = () => {
 
     return true;
   });
-
 
   const tabItems = tabLabels.map((label, index) => ({
     key: index.toString(),
@@ -293,31 +293,20 @@ const WatchList = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
 
-          <Select
+          <CommonSelectField
             defaultValue={["live"]}
-            mode="multiple"
-            style={{
-              width: 200,
-              border: "1px solid #eee",
-              borderRadius: 10,
-              padding: 6,
-            }}
-            placeholder="Status"
-            suffixIcon={<FilterOutlined />}
+            name="watchlist"
+            className="custom-select"
             options={statusOptions}
+            showSearch={true}
           />
 
-          <Select
-            defaultValue="recent"
-            style={{
-              width: 180,
-              border: "1px solid #eee",
-              borderRadius: 10,
-              padding: "20px 6px",
-              textAlign: "left",
-            }}
-            suffixIcon={<DownOutlined />}
+          <CommonSelectField
+            defaultValue={["recent"]}
+            name="watchlist"
+            className="custom-select"
             options={sortOptions}
+            showSearch={true}
           />
         </div>
 
@@ -347,6 +336,7 @@ const WatchList = () => {
 
   return (
     <section
+      className="watchlist-container"
       style={{
         padding: "24px 32px",
         background: "#fff",
@@ -380,6 +370,4 @@ const WatchList = () => {
       />
     </section>
   );
-};
-
-export default WatchList;
+}

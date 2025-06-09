@@ -329,10 +329,6 @@ a {
   box-shadow: 0 0 0 2px #7455f8 !important;
 }
 
-.ant-input-outlined:hover {
-  border-color: #4f46e5 !important;
-}
-
 /* job details */
 
 .premium-job-details {
@@ -1124,6 +1120,7 @@ a {
 .ant-collapse-item-active .ant-collapse-header {
   background-color: #4f46e5 !important;
   color: #fff !important;
+  border-radius: 8px 8px 0px 0px !important;
 }
 
 .ant-collapse-content-box p {
@@ -1142,6 +1139,7 @@ a {
   border-radius: 10px;
   font-size: 16px;
   width: 100%;
+  margin-top: 10px;
 }
 
 .icon.bookmark.active {

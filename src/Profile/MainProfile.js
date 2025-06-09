@@ -30,6 +30,7 @@ import {
   PlusOutlined,
   UploadOutlined,
   InboxOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import { IoIosMale } from "react-icons/io";
 import { IoFemaleOutline } from "react-icons/io5";
@@ -60,6 +61,9 @@ import "react-calendar-heatmap/dist/styles.css";
 import { addDays, subDays, format, parseISO } from "date-fns";
 import { motion } from "framer-motion";
 import TextArea from "antd/es/input/TextArea";
+import CommonInputField from "../Common/CommonInputField";
+import CommonSelectField from "../Common/CommonSelectField";
+import { label } from "framer-motion/client";
 const { Title, Text } = Typography;
 const { Dragger } = Upload;
 
@@ -118,12 +122,26 @@ export default function MainProfile() {
   const [activeButton, setActiveButton] = useState(null);
   const [fileName, setFileName] = useState("");
   const [userTypeactiveButton, setUserTypeActiveButton] = useState(null);
+  const defaultAvatar =
+    "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+  const [avatarUrl, setAvatarUrl] = useState(defaultAvatar);
+  const [lateral, setLateral] = useState(null);
+
+  const handleLateralTypeChange = (value) => {
+    setLateral(value);
+    console.log("Selected Lateral Entry Option:", value);
+  };
 
   const today = new Date();
   const [isLoading, setIsLoading] = useState(true);
 
   // Simulate data loading
   useEffect(() => {
+    const storedAvatar = localStorage.getItem("profileAvatar");
+    if (storedAvatar) {
+      setAvatarUrl(storedAvatar);
+    }
+
     const timer = setTimeout(() => setIsLoading(false), 800);
     return () => clearTimeout(timer);
   }, []);
@@ -206,80 +224,78 @@ export default function MainProfile() {
     }
   };
 
+  const handleUpload = (info) => {
+    const file = info.file.originFileObj || info.file;
+    if (file && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const imageDataUrl = reader.result;
+        setAvatarUrl(imageDataUrl);
+        localStorage.setItem("profileAvatar", imageDataUrl);
+        message.success("Profile image updated!");
+      };
+      reader.readAsDataURL(file);
+    } else {
+      message.error("Please upload a valid image file");
+    }
+  };
+
+  const handleRemove = () => {
+    setAvatarUrl(defaultAvatar);
+    localStorage.removeItem("profileAvatar");
+    message.error("Profile image removed.");
+  };
   // --- Tab Content Components ---
   const TabContent = {
     basic: () => (
       <div>
         <div className="form-row">
           <div className="form-group">
-            <Form.Item
-              layout="vertical"
-              label={<span style={{ fontWeight: 500 }}>First Name</span>}
+            <CommonInputField
               name="fname"
-              rules={[
-                {
-                  required: true,
-                  message: "Please enter your First Name",
-                },
-              ]}
-            >
-              <Input placeholder="Enter your fname" className="premium-input" />
-            </Form.Item>
+              label="First Name"
+              mandotary={true}
+              placeholder="Enter your first name"
+              type="text"
+              // error={"Please enter your first name"}
+            />
           </div>
           <div className="form-group">
-            <Form.Item
-              layout="vertical"
-              label={<span style={{ fontWeight: 500 }}>Last Name</span>}
+            <CommonInputField
               name="lname"
-              rules={[
-                {
-                  required: true,
-                  message: "Please enter your Last Name",
-                },
-              ]}
-            >
-              <Input placeholder="Enter your lname" className="premium-input" />
-            </Form.Item>
+              label="Last Name"
+              mandotary={true}
+              placeholder="Enter your Last Name"
+              type="text"
+              // error={"Please enter your Last Name"}
+            />
           </div>
         </div>
 
         <div className="form-group">
-          <Form.Item
-            layout="vertical"
-            label={<span style={{ fontWeight: 500 }}>Username </span>}
-            name="Username "
-            rules={[
-              {
-                required: true,
-                message: "Please enter Username ",
-              },
-            ]}
-          >
-            <Input placeholder="Your Username " className="premium-input" />
-          </Form.Item>
+          <CommonInputField
+            name="Username"
+            label="Username"
+            mandotary={true}
+            placeholder="Enter your Username"
+            type="text"
+            // error={"Please enter your Username"}
+          />
         </div>
 
         <div className="form-row">
           <div className="form-group">
-            <Form.Item
-              layout="vertical"
-              label={<span style={{ fontWeight: 500 }}>Email</span>}
+            <CommonInputField
               name="email"
-              rules={[
-                {
-                  required: true,
-                  message: "Please enter your Email",
-                },
-              ]}
-            >
-              <Input
-                placeholder="Enter your Mobile"
-                className="premium-input"
-              />
-            </Form.Item>
+              label="Email"
+              mandotary={true}
+              placeholder="Enter your Email"
+              type="email"
+              // error={"Please enter your Email"}
+            />
           </div>
           <div className="form-group">
-            <Form.Item
+            {/* <Form.Item
               layout="vertical"
               label={<span style={{ fontWeight: 500 }}>Mobile</span>}
               name="Mobile"
@@ -291,7 +307,17 @@ export default function MainProfile() {
               ]}
             >
               <Input placeholder="Enter your lname" className="premium-input" />
-            </Form.Item>
+            </Form.Item> */}
+
+            <CommonInputField
+              name="Mobile"
+              label="Mobile"
+              mandotary={true}
+              placeholder="Enter your mobile"
+              type="tel"
+              pattern={/^[6-9]\d{9}$/}
+              // error={"Please enter your mobile"}
+            />
           </div>
         </div>
 
@@ -416,57 +442,36 @@ export default function MainProfile() {
             userTypeactiveButton === "Fresher") && (
             <>
               <div className="form-group">
-                <Form.Item
-                  layout="vertical"
-                  label={<span style={{ fontWeight: 500 }}>Course</span>}
-                  name="Course"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter your Course",
-                    },
-                  ]}
-                >
-                  <Select
-                    showSearch
-                    placeholder="Select Course"
-                    optionFilterProp="label"
-                    className="premium-input"
-                  />
-                </Form.Item>
+                <CommonSelectField
+                  label="Course"
+                  name="course"
+                  mandatory={true}
+                  placeholder="Select Course"
+                  showSearch={true}
+                />
               </div>
 
               <div style={{ alignItems: "center" }} className="form-row">
                 <div className="form-group">
-                  <Form.Item
-                    layout="vertical"
-                    label={<span style={{ fontWeight: 500 }}>Start Year</span>}
-                    name="Start Year"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter your Start Year",
-                      },
-                    ]}
-                  >
-                    <Input placeholder="Start Year" className="premium-input" />
-                  </Form.Item>
+                  <CommonInputField
+                    name="startyear"
+                    label="Start Year"
+                    mandotary={true}
+                    placeholder="Enter your Start Year"
+                    type="date"
+                    // error={"Please enter your Start Year"}
+                  />
                 </div>
 
                 <div className="form-group">
-                  <Form.Item
-                    layout="vertical"
-                    label={<span style={{ fontWeight: 500 }}>End Year</span>}
-                    name="End Year"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter your End Year",
-                      },
-                    ]}
-                  >
-                    <Input placeholder="End Year" className="premium-input" />
-                  </Form.Item>
+                  <CommonInputField
+                    name="endyear"
+                    label="End Year"
+                    mandotary={true}
+                    placeholder="Enter your End Year"
+                    type="date"
+                    // error={"Please enter your End Year"}
+                  />
                 </div>
               </div>
             </>
@@ -636,22 +641,14 @@ export default function MainProfile() {
         </div>
 
         <div className="form-group">
-          <Form.Item
-            layout="vertical"
-            label={<span style={{ fontWeight: 500 }}>Location</span>}
-            name="Location"
-            rules={[
-              {
-                required: true,
-                message: "Please enter your Location",
-              },
-            ]}
-          >
-            <Input
-              placeholder="Enter your Location"
-              className="premium-input"
-            />
-          </Form.Item>
+          <CommonInputField
+            name="location"
+            label="Location"
+            mandotary={true}
+            placeholder="Enter your Location"
+            type="text"
+            // error={"Please enter your Location"}
+          />
         </div>
         <div style={{ textAlign: "-webkit-right" }} className="save_btn">
           <button className="primary-btn">
@@ -838,12 +835,23 @@ export default function MainProfile() {
             ))}
           </div>
 
-          <Input
+          {/* <Input
             placeholder="List your skills here, showcasing what you excel at."
             value={customSkill}
             className="premium-input"
             onChange={(e) => setCustomSkill(e.target.value)}
             onPressEnter={handleCustomSkillAdd}
+          /> */}
+
+          <CommonInputField
+            label={"Skills"}
+            onPressEnter={handleCustomSkillAdd}
+            value={customSkill}
+            name={"Job title"}
+            onChange={(e) => setCustomSkill(e.target.value)}
+            mandotary={true}
+            placeholder={"List your skills here, showcasing what you excel at."}
+            // error={"Please enter your job title"}
           />
           <Button
             type="primary"
@@ -858,172 +866,112 @@ export default function MainProfile() {
     education: () => (
       <div>
         <div className="form-group">
-          <Form.Item
-            layout="vertical"
-            label={<span style={{ fontWeight: 500 }}>Qualification</span>}
-            rules={[
-              {
-                required: true,
-                message: "Please Select your Qualification",
-              },
-            ]}
-            name={"Qualification"}
-          >
-            <Select
-              showSearch
-              placeholder="Select Qualification"
-              optionFilterProp="label"
-              className="premium-input"
-            />
-          </Form.Item>
+          <CommonSelectField
+            label={"Qualification"}
+            name={"qualificaton"}
+            placeholder={"Select Qualification"}
+            mandatory={true}
+            showSearch={true}
+            optionFilterProp={"lable"}
+          />
         </div>
 
         <div className="form-group">
-          <Form.Item
-            layout="vertical"
-            label={<span style={{ fontWeight: 500 }}>Course</span>}
-            rules={[
-              {
-                required: true,
-                message: "Please Select your Course",
-              },
-            ]}
-            name={"Course"}
-          >
-            <Select
-              showSearch
-              placeholder="Select Course"
-              optionFilterProp="label"
-              className="premium-input"
+          <div className="form-group">
+            <CommonSelectField
+              label={"Course"}
+              name={"course"}
+              placeholder={"Select Course"}
+              mandatory={true}
+              showSearch={true}
+              optionFilterProp={"lable"}
             />
-          </Form.Item>
+          </div>
         </div>
 
         <div className="form-group">
-          <Form.Item
-            layout="vertical"
-            label={<span style={{ fontWeight: 500 }}>Specialization</span>}
-            rules={[
-              {
-                required: true,
-                message: "Please Select your Specialization",
-              },
-            ]}
-            name={"Specialization"}
-          >
-            <Select
-              showSearch
-              placeholder="Select Specialization"
-              optionFilterProp="label"
-              className="premium-input"
-            />
-          </Form.Item>
+          <CommonSelectField
+            label={"Specialization"}
+            name={"specialization"}
+            placeholder={"Select Specialization"}
+            mandatory={true}
+            showSearch={true}
+            optionFilterProp={"lable"}
+          />
         </div>
 
         <div className="form-group">
-          <Form.Item
-            layout="vertical"
-            label={<span style={{ fontWeight: 500 }}>Collage</span>}
-            rules={[
-              {
-                required: true,
-                message: "Please Enter your Collage",
-              },
-            ]}
-            name={"Collage"}
-          >
-            <Input placeholder="Collage" className="premium-input" />
-          </Form.Item>
+          <CommonInputField
+            name="collage"
+            label="Collage"
+            mandotary={true}
+            placeholder="Collage"
+            type="text"
+            // error={"Please enter your Collage"}
+          />
         </div>
 
         <Row style={{ alignItems: "end", gap: 20 }}>
           <Col lg={11}>
             <div className="form-group">
-              <Form.Item
-                layout="vertical"
-                label={<span style={{ fontWeight: 500 }}>Duration</span>}
-                rules={[
-                  {
-                    required: true,
-                    message: "Please Enter Start year",
-                  },
-                ]}
-                name={"Duration"}
-              >
-                <Input placeholder="Start year" className="premium-input" />
-              </Form.Item>
+              <CommonInputField
+                name="startyear"
+                label="Start year"
+                mandotary={true}
+                placeholder="Start year"
+                type="date"
+                // error={"Please enter your Start year"}
+              />
             </div>
           </Col>
           <Col lg={11}>
             <div className="form-group">
-              <Form.Item
-                layout="vertical"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please Enter your End year",
-                  },
-                ]}
-              >
-                <Input placeholder="End year" className="premium-input" />
-              </Form.Item>
+              <CommonInputField
+                name="endyear"
+                label="End year"
+                mandotary={true}
+                placeholder="End year"
+                type="date"
+                // error={"Please enter your End year"}
+              />
             </div>
           </Col>
         </Row>
 
         <div className="form-group">
-          <Form.Item
-            layout="vertical"
-            label={<span style={{ fontWeight: 500 }}>Course type</span>}
-            rules={[
-              {
-                required: true,
-                message: "Please Select your Course type",
-              },
-            ]}
-            name={"Course"}
-          >
-            <Select
-              showSearch
-              placeholder="Select Course type"
-              optionFilterProp="label"
-              className="premium-input"
-            />
-          </Form.Item>
+          <CommonSelectField
+            label={"Course type"}
+            name={"coursetype"}
+            placeholder={"Select Course type"}
+            mandatory={true}
+            showSearch={true}
+            optionFilterProp={"lable"}
+          />
         </div>
 
         <Row style={{ alignItems: "end", gap: 20 }}>
           <Col lg={11}>
             <div className="form-group">
-              <Form.Item
-                layout="vertical"
-                label={<span style={{ fontWeight: 500 }}>Percentage</span>}
-                rules={[
-                  {
-                    required: true,
-                    message: "Please Enter Percentage",
-                  },
-                ]}
-                name={"Percentage"}
-              >
-                <Input placeholder="Percentage" className="premium-input" />
-              </Form.Item>
+              <CommonInputField
+                name="percentage"
+                label="Percentage"
+                mandotary={true}
+                placeholder="Percentage"
+                type="text"
+                // error={"Please enter your Percentage"}
+              />
             </div>
           </Col>
           <Col lg={11}>
             <div className="form-group">
-              <Form.Item
-                layout="vertical"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please Enter your CGPA",
-                  },
-                ]}
-                name={"CGPA"}
-              >
-                <Input placeholder="CGPA" className="premium-input" />
-              </Form.Item>
+              <CommonInputField
+                name="cgpa"
+                label="CGPA"
+                mandotary={true}
+                placeholder="CGPA"
+                type="text"
+                // error={"Please Enter your CGPA"}
+              />
             </div>
           </Col>
         </Row>
@@ -1031,45 +979,32 @@ export default function MainProfile() {
         <Row style={{ gap: 20 }}>
           <Col lg={11}>
             <div className="form-group">
-              <Form.Item
-                layout="vertical"
-                label={<span style={{ fontWeight: 500 }}>Roll Number</span>}
-                rules={[
-                  {
-                    required: true,
-                    message: "Please Enter Roll Number",
-                  },
-                ]}
-                name={"Roll"}
-              >
-                <Input placeholder="Roll Number" className="premium-input" />
-              </Form.Item>
+              <CommonInputField
+                name="rollnumber"
+                label="Roll Number"
+                mandotary={true}
+                placeholder="Roll Number"
+                type="number"
+                // error={"Please Enter your Roll Number"}
+              />
             </div>
           </Col>
           <Col lg={11}>
             <div className="form-group">
-              <Form.Item
-                layout="vertical"
-                label={
-                  <span style={{ fontWeight: 500 }}>
-                    Are you a Lateral Entry Student?
-                  </span>
-                }
-                name={"Lateral"}
-                rules={[
-                  {
-                    required: true,
-                    message: "Please Enter your Lateral Entry",
-                  },
+              <CommonSelectField
+                label="Are you a Lateral Entry Student?"
+                name="lateralstudent"
+                placeholder="Lateral Entry"
+                mandatory={true}
+                showSearch={true}
+                options={[
+                  { value: "Yes", label: "Yes" },
+                  { value: "No", label: "No" },
                 ]}
-              >
-                <Select
-                  showSearch
-                  placeholder="Lateral Entry"
-                  optionFilterProp="label"
-                  className="premium-input"
-                />
-              </Form.Item>
+                value={lateral}
+                optionFilterProp="label"
+                onChange={handleLateralTypeChange}
+              />
             </div>
           </Col>
         </Row>
@@ -1078,57 +1013,36 @@ export default function MainProfile() {
     experience: () => (
       <div>
         <div className="form-group">
-          <Form.Item
-            layout="vertical"
-            label={<span style={{ fontWeight: 500 }}>Designation</span>}
-            name={"Designation"}
-            rules={[
-              { required: true, message: "Please Select your Designation" },
-            ]}
-          >
-            <Select
-              showSearch
-              placeholder="Select Designation"
-              optionFilterProp="label"
-              className="premium-input"
-            />
-          </Form.Item>
+          <CommonSelectField
+            label="Designation"
+            name="designation"
+            mandatory={true}
+            placeholder="Select Designation"
+            showSearch={true}
+            optionFilterProp="label"
+          />
         </div>
 
         <div className="form-group">
-          <Form.Item
-            layout="vertical"
-            label={<span style={{ fontWeight: 500 }}>Organisation</span>}
-            name={"Organisation"}
-            rules={[
-              { required: true, message: "Please Select your Organisation" },
-            ]}
-          >
-            <Select
-              showSearch
-              placeholder="Select Organisation"
-              optionFilterProp="label"
-              className="premium-input"
-            />
-          </Form.Item>
+          <CommonSelectField
+            label="Organisation"
+            name="organisation"
+            mandatory={true}
+            placeholder="Select Organisation"
+            showSearch={true}
+            optionFilterProp="label"
+          />
         </div>
 
         <div className="form-group">
-          <Form.Item
-            layout="vertical"
-            label={<span style={{ fontWeight: 500 }}>Employment Type</span>}
-            name={"EmploymentType"}
-            rules={[
-              { required: true, message: "Please Select your Employment Type" },
-            ]}
-          >
-            <Select
-              showSearch
-              placeholder="Select Employment Type"
-              optionFilterProp="label"
-              className="premium-input"
-            />
-          </Form.Item>
+          <CommonSelectField
+            label="Employmenttype"
+            name="employmenttype"
+            mandatory={true}
+            placeholder="Select Employmenttype"
+            showSearch={true}
+            optionFilterProp="label"
+          />
         </div>
 
         <div style={{ alignItems: "end" }} className="form-row">
@@ -1172,19 +1086,14 @@ export default function MainProfile() {
         </div>
 
         <div className="form-group">
-          <Form.Item
-            layout="vertical"
-            label={<span style={{ fontWeight: 500 }}>Location</span>}
-            rules={[
-              {
-                required: true,
-                message: "Please Enter your Location",
-              },
-            ]}
-            name={"Location"}
-          >
-            <Input placeholder="Location" className="premium-input" />
-          </Form.Item>
+          <CommonInputField
+            name={"location"}
+            label="Location"
+            mandotary={true}
+            placeholder={"Location"}
+            type={"text"}
+            // error={"Please Enter your Location"}
+          />
         </div>
       </div>
     ),
@@ -1192,64 +1101,70 @@ export default function MainProfile() {
       <div>
         <div style={{ alignItems: "end" }} className="form-row">
           <div className="form-group">
-            <Form.Item
-              layout="vertical"
-              label={<span style={{ fontWeight: 500 }}>Linkedin</span>}
+            <CommonInputField
               name="Linkedin"
-            >
-              <Input placeholder="Add Link" className="premium-input" />
-            </Form.Item>
+              label="Linkedin"
+              mandotary={true}
+              placeholder="Add link"
+              type="text"
+              // error={"Please Enter your Linkedin"}
+            />
           </div>
           <div className="form-group">
-            <Form.Item
-              layout="vertical"
+            <CommonInputField
               name="Facebook"
-              label={<span style={{ fontWeight: 500 }}>Facebook</span>}
-            >
-              <Input placeholder="Add Link" className="premium-input" />
-            </Form.Item>
+              label="Facebook"
+              mandotary={true}
+              placeholder="Add link"
+              type="text"
+              // error={"Please Enter your Facebook"}
+            />
           </div>
         </div>
 
         <div style={{ alignItems: "end" }} className="form-row">
           <div className="form-group">
-            <Form.Item
-              layout="vertical"
-              label={<span style={{ fontWeight: 500 }}>Instagram</span>}
+            <CommonInputField
               name="Instagram"
-            >
-              <Input placeholder="Add Link" className="premium-input" />
-            </Form.Item>
+              label="Instagram"
+              mandotary={true}
+              placeholder="Add link"
+              type="text"
+              // error={"Please Enter your Instagram"}
+            />
           </div>
           <div className="form-group">
-            <Form.Item
-              layout="vertical"
+            <CommonInputField
               name="Twitter"
-              label={<span style={{ fontWeight: 500 }}>Twitter</span>}
-            >
-              <Input placeholder="Add Link" className="premium-input" />
-            </Form.Item>
+              label="Twitter"
+              mandotary={true}
+              placeholder="Add link"
+              type="text"
+              // error={"Please Enter your Twitter"}
+            />
           </div>
         </div>
 
         <div style={{ alignItems: "end" }} className="form-row">
           <div className="form-group">
-            <Form.Item
-              layout="vertical"
-              label={<span style={{ fontWeight: 500 }}>Dribbble</span>}
+            <CommonInputField
               name="Dribbble"
-            >
-              <Input placeholder="Add Link" className="premium-input" />
-            </Form.Item>
+              label="Dribbble"
+              mandotary={true}
+              placeholder="Add link"
+              type="text"
+              // error={"Please Enter your Dribbble"}
+            />
           </div>
           <div className="form-group">
-            <Form.Item
-              layout="vertical"
+            <CommonInputField
               name="Behance"
-              label={<span style={{ fontWeight: 500 }}>Behance</span>}
-            >
-              <Input placeholder="Add Link" className="premium-input" />
-            </Form.Item>
+              label="Behance"
+              mandotary={true}
+              placeholder="Add link"
+              type="text"
+              // error={"Please Enter your Behance"}
+            />
           </div>
         </div>
       </div>
@@ -1258,24 +1173,14 @@ export default function MainProfile() {
     projects: () => (
       <div>
         <div className="form-group">
-          <Form.Item
-            layout="vertical"
-            label={<span style={{ fontWeight: 500 }}>Project Name</span>}
-            rules={[
-              {
-                required: true,
-                message: "Please Enter your Project Name",
-              },
-            ]}
-            name={"Qualification"}
-          >
-            <Select
-              showSearch
-              placeholder="Project Name"
-              optionFilterProp="label"
-              className="premium-input"
-            />
-          </Form.Item>
+          <CommonInputField
+            name="projectname"
+            label="Project Name"
+            mandotary={true}
+            placeholder="Project Name"
+            type="text"
+            // error={"Please Enter your Project Name"}
+          />
         </div>
 
         <div className="form-group">
@@ -1433,24 +1338,81 @@ export default function MainProfile() {
       <Content className="profile-main-content">
         {/* Profile Header Card */}
         <Card className="profile-header-card">
-          <div className="profile-header-content">
-            <div className="profile-header-left">
-              <Avatar
-                size={90}
-                src="https://i.imgur.com/your-avatar.png"
-                className="main-profile-avatar"
-              />
-              <div className="profile-header-info">
-                <h2>Santhosh Kathirvel</h2>
-                <p className="username">@santhkat7778</p>
-                <div className="profile-tags">
+          <div
+            className="profile-header-content"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <div
+              className="profile-header-left"
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              <div
+                style={{
+                  position: "relative",
+                  display: "inline-block",
+                  border: "1px solid #cfcfcf",
+                  borderRadius: "50%",
+                  padding: "7px",
+                }}
+              >
+                <Avatar size={90} src={avatarUrl} />
+                <Upload
+                  showUploadList={false}
+                  beforeUpload={() => false}
+                  onChange={handleUpload}
+                >
+                  <Button
+                    icon={<UploadOutlined />}
+                    size="small"
+                    style={{
+                      position: "absolute",
+                      bottom: 0,
+                      right: 0,
+                      borderRadius: "50%",
+                      padding: "4px 2px",
+                      fontSize: 12,
+                      backgroundColor: "#fff",
+                      boxShadow: "0 0 4px rgba(0,0,0,0.1)",
+                    }}
+                  />
+                </Upload>
+
+                {/* Remove Button */}
+                {avatarUrl !== defaultAvatar && (
+                  <Button
+                    icon={<DeleteOutlined />}
+                    size="small"
+                    danger
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      right: "0px",
+                      borderRadius: "50%",
+                      padding: "4px 2px",
+                      fontSize: 12,
+                      backgroundColor: "#fff",
+                      boxShadow: "0 0 4px rgba(0,0,0,0.1)",
+                    }}
+                    onClick={handleRemove}
+                  />
+                )}
+              </div>
+
+              <div style={{ marginLeft: 16, textAlign: "left" }}>
+                <h2 style={{ marginBottom: 4 }}>Santhosh Kathirvel</h2>
+                <p style={{ marginBottom: 6, color: "#666" }}>@santhkat7778</p>
+                <div>
                   <Tag color="blue">Markerz Global Solution</Tag>
                   <Tag color="purple">Accountant</Tag>
                 </div>
               </div>
             </div>
 
-            <Space className="profile-header-actions">
+            <Space>
               <Tooltip title="Share profile">
                 <Button shape="circle" icon={<LinkOutlined />} />
               </Tooltip>
@@ -1458,9 +1420,9 @@ export default function MainProfile() {
                 <Button shape="circle" icon={<EyeOutlined />} />
               </Tooltip>
               <Button
-                style={{ background: "#5f2eea" }}
                 type="primary"
                 icon={<EditOutlined />}
+                style={{ background: "#5f2eea", borderColor: "#5f2eea" }}
               >
                 Edit Profile
               </Button>

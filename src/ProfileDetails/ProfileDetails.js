@@ -16,7 +16,7 @@ import {
   message,
   DatePicker,
   Space,
-  Spin
+  Spin,
 } from "antd";
 import {
   UserOutlined,
@@ -36,6 +36,8 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import "../css/ProfileDetailsPage.css";
 import { MdDeleteForever } from "react-icons/md";
+import CommonInputField from "../Common/CommonInputField";
+import CommonSelectField from "../Common/CommonSelectField";
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -74,70 +76,69 @@ const ProfileDetails = () => {
   const [recaptchaInitAttempts, setRecaptchaInitAttempts] = useState(0);
 
   const initializeRecaptcha = useCallback(async () => {
-  try {
-    // Check if Firebase auth is available
-    if (!auth) {
-      console.error("Firebase auth not initialized");
-      return;
-    }
+    try {
+      // Check if Firebase auth is available
+      if (!auth) {
+        console.error("Firebase auth not initialized");
+        return;
+      }
 
-    // Clear existing verifier
-    if (window.recaptchaVerifier) {
-      window.recaptchaVerifier.clear();
-      delete window.recaptchaVerifier;
-    }
+      // Clear existing verifier
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
+        delete window.recaptchaVerifier;
+      }
 
-    // Wait for grecaptcha to be available
-    if (!window.grecaptcha || !window.grecaptcha.enterprise) {
-      console.log("Waiting for grecaptcha to load...");
-      await new Promise(resolve => {
-        const checkInterval = setInterval(() => {
-          if (window.grecaptcha?.enterprise) {
-            clearInterval(checkInterval);
-            resolve();
-          }
-        }, 100);
-      });
-    }
+      // Wait for grecaptcha to be available
+      if (!window.grecaptcha || !window.grecaptcha.enterprise) {
+        console.log("Waiting for grecaptcha to load...");
+        await new Promise((resolve) => {
+          const checkInterval = setInterval(() => {
+            if (window.grecaptcha?.enterprise) {
+              clearInterval(checkInterval);
+              resolve();
+            }
+          }, 100);
+        });
+      }
 
-    const verifier = new RecaptchaVerifier(
-      "recaptcha-container",
-      {
-        size: "invisible",
-        callback: () => {
-          console.log("reCAPTCHA solved");
-          setRecaptchaReady(true);
+      const verifier = new RecaptchaVerifier(
+        "recaptcha-container",
+        {
+          size: "invisible",
+          callback: () => {
+            console.log("reCAPTCHA solved");
+            setRecaptchaReady(true);
+          },
+          "expired-callback": () => {
+            console.log("reCAPTCHA expired");
+            setRecaptchaReady(false);
+          },
         },
-        'expired-callback': () => {
-          console.log("reCAPTCHA expired");
-          setRecaptchaReady(false);
-        }
-      },
-      auth
-    );
+        auth
+      );
 
-    // Verify the verifier was created
-    if (!verifier) {
-      throw new Error("Failed to create verifier");
+      // Verify the verifier was created
+      if (!verifier) {
+        throw new Error("Failed to create verifier");
+      }
+
+      window.recaptchaVerifier = verifier;
+      setRecaptchaVerifier(verifier);
+
+      // Force verification
+      await verifier.verify();
+      setRecaptchaReady(true);
+      console.log("reCAPTCHA initialized successfully");
+    } catch (error) {
+      console.error("reCAPTCHA initialization failed:", error);
+      setRecaptchaReady(false);
+      // Retry with exponential backoff
+      const delay = Math.min(1000 * Math.pow(2, recaptchaInitAttempts), 10000);
+      setTimeout(initializeRecaptcha, delay);
     }
-
-    window.recaptchaVerifier = verifier;
-    setRecaptchaVerifier(verifier);
-
-    // Force verification
-    await verifier.verify();
-    setRecaptchaReady(true);
-    console.log("reCAPTCHA initialized successfully");
-
-  } catch (error) {
-    console.error("reCAPTCHA initialization failed:", error);
-    setRecaptchaReady(false);
-    // Retry with exponential backoff
-    const delay = Math.min(1000 * Math.pow(2, recaptchaInitAttempts), 10000);
-    setTimeout(initializeRecaptcha, delay);
-  }
-}, [auth, recaptchaInitAttempts]);
-// 
+  }, [auth, recaptchaInitAttempts]);
+  //
 
   useEffect(() => {
     setCountryList(Country.getAllCountries());
@@ -151,18 +152,18 @@ const ProfileDetails = () => {
   }, [initializeRecaptcha]);
 
   useEffect(() => {
-  // Load reCAPTCHA script dynamically if not present
-  if (!window.recaptchaVerifier) {
-    const script = document.createElement('script');
-    script.src = 'https://www.google.com/recaptcha/api.js?render=explicit';
-    script.async = true;
-    script.defer = true;
-    script.onload = () => initializeRecaptcha();
-    document.body.appendChild(script);
-  } else {
-    initializeRecaptcha();
-  }
-}, []);
+    // Load reCAPTCHA script dynamically if not present
+    if (!window.recaptchaVerifier) {
+      const script = document.createElement("script");
+      script.src = "https://www.google.com/recaptcha/api.js?render=explicit";
+      script.async = true;
+      script.defer = true;
+      script.onload = () => initializeRecaptcha();
+      document.body.appendChild(script);
+    } else {
+      initializeRecaptcha();
+    }
+  }, []);
 
   const handleCountryChange = (countryCode) => {
     const country = countryList.find((c) => c.isoCode === countryCode);
@@ -445,152 +446,75 @@ const ProfileDetails = () => {
             <div className="form-section">
               <div className="form-row">
                 <div className="form-group">
-                  <Form.Item
-                    layout="vertical"
-                    label={<span style={{ fontWeight: 500 }}>First Name</span>}
-                    name="fname"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter your First Name",
-                      },
-                    ]}
-                  >
-                    <Input
-                      placeholder="Enter your fname"
-                      className="premium-input"
-                    />
-                  </Form.Item>
+                  <CommonInputField
+                    name={"First Name"}
+                    label="First Name"
+                    mandotary={true}
+                    placeholder={"Enter your first name"}
+                    type={"text"}
+                    // error={"Please Enter your first name"}
+                  />
                 </div>
                 <div className="form-group">
-                  <Form.Item
-                    layout="vertical"
-                    label={<span style={{ fontWeight: 500 }}>Last Name</span>}
-                    name="lname"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter your Last Name",
-                      },
-                    ]}
-                  >
-                    <Input
-                      placeholder="Enter your lname"
-                      className="premium-input"
-                    />
-                  </Form.Item>
+                  <CommonInputField
+                    name={"Last Name"}
+                    label="Last Name"
+                    mandotary={true}
+                    placeholder={"Enter your last name"}
+                    type={"text"}
+                    // error={"Please Enter your last name"}
+                  />
                 </div>
               </div>
               <div className="form-group">
-                <Form.Item
-                  layout="vertical"
-                  id="email_verified"
-                  label={<span style={{ fontWeight: 500 }}>Email Address</span>}
-                  name="email"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter your Email Address",
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="premium-input"
-                  />
-                </Form.Item>
+                <CommonInputField
+                  name={"Email"}
+                  label="Email Address"
+                  mandotary={true}
+                  placeholder={"Enter your email"}
+                  type={"email"}
+                  onChange={(e) => setEmail(e.target.value)}
+                  // error={"Please Enter your email"}
+                />
               </div>
               <div className="form-group">
-                <Form.Item
-                  layout="vertical"
-                  id="number_verified"
-                  label={<span style={{ fontWeight: 500 }}>Phone Number</span>}
-                  name="number"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter your phone number",
-                    },
-                    {
-                      pattern: /^[6-9]\d{9}$/,
-                      message: "Enter a valid 10-digit Indian mobile number",
-                    },
-                  ]}
-                >
-                  <Input
-                    placeholder="Enter your number"
-                    value={number}
-                    onChange={(e) => setNumber(e.target.value)}
-                    className="premium-input"
-                  />
-                </Form.Item>
+                <CommonInputField
+                  name={"Phone number"}
+                  label="Phone Number"
+                  mandotary={true}
+                  placeholder={"Enter your phone number"}
+                  type={"tel"}
+                  pattern={/^[6-9]\d{9}$/}
+                  // error={"Please enter your phone number"}
+                />
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <Form.Item
-                    layout="vertical"
-                    label={<span style={{ fontWeight: 500 }}>Country</span>}
+                  <CommonSelectField
+                    label="Country"
                     name="country"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please select your Country",
-                      },
-                    ]}
-                  >
-                    <Select
-                      showSearch
-                      placeholder="Select Country"
-                      optionFilterProp="children"
-                      onChange={handleCountryChange}
-                      className="premium-input"
-                    >
-                      {countryList.map((country) => (
-                        <Select.Option
-                          key={country.isoCode}
-                          value={country.isoCode}
-                        >
-                          {country.name}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
+                    mandatory={true}
+                    placeholder="Select Country"
+                    options={countryList}
+                    onChange={handleCountryChange}
+                    showSearch={true}
+                  />
                 </div>
                 <div className="form-group">
-                  <Form.Item
-                    layout="vertical"
-                    label={<span style={{ fontWeight: 500 }}>State</span>}
+                  <CommonSelectField
+                    label="State"
                     name="state"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please select your State",
-                      },
-                    ]}
-                  >
-                    <Select
-                      showSearch
-                      placeholder="Select State"
-                      optionFilterProp="children"
-                      disabled={!selectedCountry}
-                      className="premium-input"
-                      onChange={handleStateChange}
-                    >
-                      {stateList.map((state) => (
-                        <Select.Option key={state.isoCode} value={state.name}>
-                          {state.name}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
+                    disabled={!selectedCountry}
+                    mandatory={true}
+                    placeholder="Select State"
+                    options={stateList}
+                    onChange={handleStateChange}
+                    showSearch={true}
+                  />
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <Form.Item
+              {/* <Form.Item
                     layout="vertical"
                     label={<span style={{ fontWeight: 500 }}>City</span>}
                     name="city"
@@ -615,25 +539,31 @@ const ProfileDetails = () => {
                         </Select.Option>
                       ))}
                     </Select>
-                  </Form.Item>
-                </div>
+                  </Form.Item> */}
+
+              <div className="form-row">
                 <div className="form-group">
-                  <Form.Item
-                    layout="vertical"
-                    label={<span style={{ fontWeight: 500 }}>Pincode</span>}
-                    name="Pincode"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter your Pincode",
-                      },
-                    ]}
-                  >
-                    <Input
-                      placeholder="Your Pincode"
-                      className="premium-input"
-                    />
-                  </Form.Item>
+                  <CommonSelectField
+                    label="City"
+                    name="city"
+                    mandatory={true}
+                    placeholder="Select City"
+                    options={cityList}
+                    onChange={handleCityChange}
+                    showSearch={true}
+                    // disabled={!selectedState}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <CommonInputField
+                    name={"Pincode"}
+                    label="Pincode"
+                    mandotary={true}
+                    placeholder={"Enter your pincode"}
+                    type={"number"}
+                    // error={"Please enter your pincode"}
+                  />
                 </div>
               </div>
               <div className="form-group">
@@ -668,7 +598,7 @@ const ProfileDetails = () => {
           <Card className="premium-card">
             <div className="form-section">
               <div className="form-group">
-                <Form.Item
+                {/* <Form.Item
                   layout="vertical"
                   label={
                     <span style={{ fontWeight: 500 }}>
@@ -697,108 +627,97 @@ const ProfileDetails = () => {
                       },
                     ]}
                   />
-                </Form.Item>
+                </Form.Item> */}
+
+                <CommonSelectField
+                  label="Fresher / Experience"
+                  name="fresherexperience"
+                  mandatory={true}
+                  placeholder="Select Experience"
+                  options={[
+                    {
+                      value: "Fresher",
+                      label: "Fresher",
+                    },
+                    {
+                      value: "Experience",
+                      label: "Experience",
+                    },
+                  ]}
+                  onChange={handleExperienceTypeChange}
+                  showSearch={true}
+                />
               </div>
               {(experienceType === "Experience" || experienceType === null) && (
                 <div className="forexprience">
                   <div className="form-row">
                     <div className="form-group">
-                      <Form.Item
-                        layout="vertical"
-                        label={
-                          <span style={{ fontWeight: 500 }}>
-                            Total Years Of Experience
-                          </span>
-                        }
-                        name="yearsexperience"
-                        rules={[
+                      <CommonSelectField
+                        label=" Total Years of Experience"
+                        name="totalexperience"
+                        mandatory={true}
+                        placeholder="Select Experience"
+                        options={[
                           {
-                            required: true,
-                            message: "Please enter your job title",
+                            value: "0 Years",
+                            label: "0 Years",
+                          },
+                          {
+                            value: "1 Years",
+                            label: "1 Years",
+                          },
+                          {
+                            value: "2 Years",
+                            label: "2 Years",
+                          },
+                          {
+                            value: "3 Years",
+                            label: "3 Years",
+                          },
+                          {
+                            value: "4 Years",
+                            label: "4 Years",
+                          },
+                          {
+                            value: "5 Years",
+                            label: "5 Years",
+                          },
+                          {
+                            value: "6 Years",
+                            label: "6 Years",
+                          },
+                          {
+                            value: "7 Years",
+                            label: "7 Years",
+                          },
+                          {
+                            value: "8 Years",
+                            label: "8 Years",
+                          },
+                          {
+                            value: "9 Years",
+                            label: "9 Years",
+                          },
+                          {
+                            value: "10 Years",
+                            label: "10 Years",
+                          },
+                          {
+                            value: "11 Years",
+                            label: "11 Years",
                           },
                         ]}
-                      >
-                        <Select
-                          showSearch
-                          placeholder="Select Experience"
-                          optionFilterProp="label"
-                          className="premium-input"
-                          options={[
-                            {
-                              value: "0 Years",
-                              label: "0 Years",
-                            },
-                            {
-                              value: "1 Years",
-                              label: "1 Years",
-                            },
-                            {
-                              value: "2 Years",
-                              label: "2 Years",
-                            },
-                            {
-                              value: "3 Years",
-                              label: "3 Years",
-                            },
-                            {
-                              value: "4 Years",
-                              label: "4 Years",
-                            },
-                            {
-                              value: "5 Years",
-                              label: "5 Years",
-                            },
-                            {
-                              value: "6 Years",
-                              label: "6 Years",
-                            },
-                            {
-                              value: "7 Years",
-                              label: "7 Years",
-                            },
-                            {
-                              value: "8 Years",
-                              label: "8 Years",
-                            },
-                            {
-                              value: "9 Years",
-                              label: "9 Years",
-                            },
-                            {
-                              value: "10 Years",
-                              label: "10 Years",
-                            },
-                            {
-                              value: "11 Years",
-                              label: "11 Years",
-                            },
-                          ]}
-                        />
-                      </Form.Item>
+                        showSearch={true}
+                      />
                     </div>
                     <div className="form-group">
-                      <Form.Item
-                        layout="vertical"
-                        label={
-                          <span style={{ fontWeight: 500 }}>
-                            Total Months Of Experience
-                          </span>
-                        }
+                      <CommonSelectField
+                        label="Total Months gf Experience"
                         name="experiencemonth"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please enter your job title",
-                          },
-                        ]}
-                      >
-                        <Select
-                          showSearch
-                          placeholder="Select Experience"
-                          optionFilterProp="label"
-                          className="premium-input"
-                          options={[
-                            {
+                        mandatory={true}
+                        placeholder="Select Experience"
+                        options={[
+                                                      {
                               value: "0 Month",
                               label: "0 Month",
                             },
@@ -850,28 +769,20 @@ const ProfileDetails = () => {
                               value: "12 Months",
                               label: "12 Months",
                             },
-                          ]}
-                        />
-                      </Form.Item>
+                        ]}
+                        showSearch={true}
+                      />
                     </div>
                   </div>
                   <div className="form-group">
-                    <Form.Item
-                      layout="vertical"
-                      label={<span style={{ fontWeight: 500 }}>Job Title</span>}
-                      name="jobTitle"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter your job title",
-                        },
-                      ]}
-                    >
-                      <Input
-                        placeholder="Software Engineer"
-                        className="premium-input"
-                      />
-                    </Form.Item>
+                    <CommonInputField
+                      name={"Job title"}
+                      label="Job Title"
+                      mandotary={true}
+                      placeholder={"Software Engineer"}
+                      type={"text"}
+                      // error={"Please enter your job title"}
+                    />
                   </div>
                   {companies.map((company, index) => (
                     <div className="add-company-section" key={company.id}>
@@ -888,48 +799,24 @@ const ProfileDetails = () => {
                       </div>
                       <div className="form-row">
                         <div className="form-group">
-                          <Form.Item
-                            layout="vertical"
-                            label={
-                              <span style={{ fontWeight: 500 }}>
-                                Company name
-                              </span>
-                            }
-                            name={["companies", index, "company"]}
-                            rules={[
-                              {
-                                required: true,
-                                message: "Please enter your Company name",
-                              },
-                            ]}
-                          >
-                            <Input
-                              placeholder="Tech Corp Inc."
-                              className="premium-input"
-                            />
-                          </Form.Item>
+                          <CommonInputField
+                            name={"Company name"}
+                            label=" Company name"
+                            mandotary={true}
+                            placeholder={"Tech Corp Inc."}
+                            type={"text"}
+                            // error={"Please enter your  Company name"}
+                          />
                         </div>
                         <div className="form-group">
-                          <Form.Item
-                            layout="vertical"
-                            label={
-                              <span style={{ fontWeight: 500 }}>
-                                Designation
-                              </span>
-                            }
-                            name={["companies", index, "designation"]}
-                            rules={[
-                              {
-                                required: true,
-                                message: "Please enter your Designation",
-                              },
-                            ]}
-                          >
-                            <Input
-                              placeholder="Enter your Designation"
-                              className="premium-input"
-                            />
-                          </Form.Item>
+                          <CommonInputField
+                            name={"Designation"}
+                            label=" Designation"
+                            mandotary={true}
+                            placeholder={"Enter your designation"}
+                            type={"text"}
+                            // error={"Please enter your  designation"}
+                          />
                         </div>
                       </div>
 

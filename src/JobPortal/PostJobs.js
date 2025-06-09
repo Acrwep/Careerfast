@@ -52,6 +52,7 @@ import { FaHeartCircleCheck } from "react-icons/fa6";
 import { style } from "framer-motion/client";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import CommonInputField from "../Common/CommonInputField";
 const { Option } = Select;
 const { Group: InputGroup } = Input;
 export default function PostJobs() {
@@ -279,46 +280,24 @@ export default function PostJobs() {
             />
           </Modal>
 
-          <div className="form-group">
-            <Form.Item
-              layout="vertical"
-              label={
-                <span style={{ fontWeight: 500 }}>
-                  Company you are hiring for
-                </span>
-              }
-              name="hiring"
-              rules={[
-                {
-                  required: true,
-                  message: "Please enter your First Name",
-                },
-              ]}
-            >
-              <Input
-                placeholder="Enter your company name"
-                className="premium-input"
-              />
-            </Form.Item>
-          </div>
+          <CommonInputField
+            name={"Company name"}
+            label="Company you are hiring for"
+            mandotary={true}
+            placeholder={"Enter your company name"}
+            type={"text"}
+            // error={"Please enter your company name"}
+          />
 
           <div className="form-group">
-            <Form.Item
-              layout="vertical"
-              label={<span style={{ fontWeight: 500 }}>Job Title/Role</span>}
-              name="fname"
-              rules={[
-                {
-                  required: true,
-                  message: "Please enter your job title",
-                },
-              ]}
-            >
-              <Input
-                placeholder="Enter your job title"
-                className="premium-input"
-              />
-            </Form.Item>
+            <CommonInputField
+              name={"Job title"}
+              label="Job Title/Role"
+              mandotary={true}
+              placeholder={"Enter your job title"}
+              type={"text"}
+              // error={"Please enter your job title"}
+            />
           </div>
 
           <div className="form-group">
@@ -712,11 +691,13 @@ export default function PostJobs() {
               {experienceRequired[experienceRequiredActiveButton]?.name ===
               "Experienced" ? (
                 <>
-                  <p>Experience required</p>
                   <div className="">
-                    <Input
-                      placeholder="Enter your Experience"
-                      className="premium-input"
+                    <CommonInputField
+                      name={"Experience"}
+                      label="Experience required"
+                      mandotary={false}
+                      placeholder={"Enter your Experience"}
+                      type={"text"}
                     />
                   </div>
                 </>

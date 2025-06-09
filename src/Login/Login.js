@@ -16,12 +16,15 @@ import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import "../css/LoginPage.css";
 import loginImage from "../images/login_image.png";
 import Header from "../Header/Header";
+import CommonInputField from "../Common/CommonInputField";
 
 const { Title, Text, Link } = Typography;
 
 const LoginPage = () => {
   const [activeTab, setActiveTab] = useState("candidate");
   const [form] = Form.useForm();
+  const [email, setEmail] = useState("");
+    const [emailError, setEmailError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const onFinish = async (values) => {
@@ -105,23 +108,15 @@ const LoginPage = () => {
                 layout="vertical"
                 scrollToFirstError
               >
-                <Form.Item
-                  label={<span style={{ fontWeight: 500 }}>Email</span>}
+                <CommonInputField
+                  label="Email"
                   name="email"
-                  rules={[
-                    { required: true, message: "Please enter your email" },
-                    { type: "email", message: "Please enter a valid email" },
-                  ]}
-                >
-                  <Input
-                    prefix={
-                      <MailOutlined style={{ color: "rgba(0,0,0,.25)" }} />
-                    }
-                    placeholder="your@email.com"
-                    size="large"
-                    className="premium-input"
-                  />
-                </Form.Item>
+                  mandotary={true}
+                  placeholder={"Enter your email"}
+                  type={"email"}
+                  value={email}
+                  // error={"lll"}
+                />
 
                 <Form.Item
                   label={<span style={{ fontWeight: 500 }}>Password</span>}

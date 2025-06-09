@@ -220,7 +220,7 @@ export default function JobDetails() {
                 </button>
                 <Drawer
                   size="default"
-                  title="Basic Information"
+                  title="Apply Now"
                   closable={{ "aria-label": "Close Button" }}
                   onClose={onClose}
                   open={open}
