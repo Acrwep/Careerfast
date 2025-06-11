@@ -1,43 +1,43 @@
 import React from "react";
-import { Input, Form } from "antd";
-import { pattern } from "framer-motion/client";
-import "./commonstyles.css";
-
-export default function CommonInputField({
+import { Form, Input } from "antd";
+const { Password } = Input;
+export default function CommonPasswordField({
   label,
-  mandotary,
-  onChange,
-  error,
-  placeholder,
-  type,
-  pattern,
-  value,
+  mandatory,
   name,
-  onPressEnter,
+  placeholder,
+  value,
+  error,
   errorMessage,
+  message,
+  onChange,
   prefix,
+  size,
+  min,
 }) {
   return (
-    <div className="commoninputfield">
+    <div className="commonpassfield">
       <Form.Item
         layout="vertical"
-        name={name}
+        help={error}
         label={<span style={{ fontWeight: 500 }}>{label}</span>}
+        name={name}
         rules={[
           {
-            required: mandotary,
+            required: mandatory,
+          },
+          {
+            min: min,
           },
         ]}
       >
-        <Input
-          placeholder={placeholder}
-          className={"premium-input"}
-          onChange={onChange}
-          type={type}
-          pattern={pattern}
-          value={value}
+        <Input.Password
           prefix={prefix}
-          onPressEnter={onPressEnter}
+          placeholder={placeholder}
+          size={size}
+          value={value}
+          className="premium-input"
+          onChange={onChange}
         />
       </Form.Item>
       <div

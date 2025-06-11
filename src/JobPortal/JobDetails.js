@@ -31,6 +31,7 @@ import { FiLock } from "react-icons/fi";
 import { BsBookmarkDash } from "react-icons/bs";
 import { BsBookmarkPlusFill } from "react-icons/bs";
 import { CommonToaster } from "../Common/CommonToaster";
+import CommonTextArea from "../Common/CommonTextArea";
 
 const tabs = [
   "Job Description",

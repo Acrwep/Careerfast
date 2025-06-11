@@ -46,6 +46,7 @@ import "../css/JobFilter.css";
 import { FaLocationDot } from "react-icons/fa6";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import CommonSelectField from "../Common/CommonSelectField";
+import { style } from "framer-motion/client";
 
 const { Title, Text, Link } = Typography;
 const jobs = [
@@ -663,6 +664,7 @@ export default function JobFilter() {
       }}
     >
       <div
+      className="job-filter-topbar"
         style={{
           display: "flex",
           alignItems: "center",
@@ -688,13 +690,7 @@ export default function JobFilter() {
           }}
         >
           <Button
-            style={{
-              background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
-              border: "none",
-              boxShadow: "0 2px 8px rgba(79, 70, 229, 0.2)",
-              padding: "0 20px",
-              height: 36,
-            }}
+          className="job-filter-job"
             shape="round"
             type="primary"
           >
@@ -730,6 +726,7 @@ export default function JobFilter() {
             </Button>
           ) : (
             <CommonSelectField
+              // label={false}
               style={{
                 border: "1px solid rgba(0, 0, 0, 0.08)",
                 background: "#fff",

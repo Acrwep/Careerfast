@@ -64,6 +64,7 @@ import TextArea from "antd/es/input/TextArea";
 import CommonInputField from "../Common/CommonInputField";
 import CommonSelectField from "../Common/CommonSelectField";
 import { label } from "framer-motion/client";
+import CommonTextArea from "../Common/CommonTextArea";
 const { Title, Text } = Typography;
 const { Dragger } = Upload;
 
@@ -738,7 +739,9 @@ export default function MainProfile() {
           </div>
         </div>
 
-        <Input.TextArea
+        <CommonTextArea
+          style={{ height: 150 }}
+          mandatory={true}
           rows={6}
           value={aboutText}
           onChange={(e) => setAboutText(e.target.value)}
@@ -813,7 +816,6 @@ export default function MainProfile() {
         </div>
 
         <div style={{ marginBottom: 16 }}>
-          <Text strong>Skills</Text>
           <div style={{ marginTop: 8, marginBottom: 12 }}>
             {selectedSkills.map((skill) => (
               <Tag
@@ -834,14 +836,6 @@ export default function MainProfile() {
               </Tag>
             ))}
           </div>
-
-          {/* <Input
-            placeholder="List your skills here, showcasing what you excel at."
-            value={customSkill}
-            className="premium-input"
-            onChange={(e) => setCustomSkill(e.target.value)}
-            onPressEnter={handleCustomSkillAdd}
-          /> */}
 
           <CommonInputField
             label={"Skills"}
@@ -1036,7 +1030,7 @@ export default function MainProfile() {
 
         <div className="form-group">
           <CommonSelectField
-            label="Employmenttype"
+            label="Employment type"
             name="employmenttype"
             mandatory={true}
             placeholder="Select Employmenttype"
@@ -1283,19 +1277,12 @@ export default function MainProfile() {
         {/*  */}
 
         <div className="form-group">
-          <Form.Item
-            layout="vertical"
-            label={<span style={{ fontWeight: 500 }}>Project Description</span>}
-            rules={[
-              {
-                required: true,
-                message: "Please Select your Specialization",
-              },
-            ]}
-            name={"Specialization"}
-          >
-            <TextArea placeholder="Enter your description" />
-          </Form.Item>
+          <CommonTextArea
+            label={"Project Description"}
+            placeholder={"Enter your description"}
+            mandatory={true}
+            name={"description"}
+          />
         </div>
       </div>
     ),
@@ -1420,9 +1407,9 @@ export default function MainProfile() {
                 <Button shape="circle" icon={<EyeOutlined />} />
               </Tooltip>
               <Button
+                className="userprofile-edit-profile"
                 type="primary"
                 icon={<EditOutlined />}
-                style={{ background: "#5f2eea", borderColor: "#5f2eea" }}
               >
                 Edit Profile
               </Button>

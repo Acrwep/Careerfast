@@ -399,6 +399,7 @@
   place-content: center;
   cursor: pointer;
   transition: 0.3s all;
+  text-align: center;
 }
 
 .elite-carousel-container .custom-prev {
@@ -413,6 +414,7 @@
   place-content: center;
   cursor: pointer;
   transition: 0.3s all;
+  text-align: center;
 }
 
 .elite-carousel-rightRole-container .custom-next {
@@ -427,6 +429,7 @@
   place-content: center;
   cursor: pointer;
   transition: 0.3s all;
+  text-align: center;
 }
 
 .elite-carousel-rightRole-container .custom-prev {
@@ -441,6 +444,7 @@
   place-content: center;
   cursor: pointer;
   transition: 0.3s all;
+  text-align: center;
 }
 
 .custom-prev:hover {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Tabs,
   Form,
@@ -16,32 +16,39 @@ import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import "../css/LoginPage.css";
 import loginImage from "../images/login_image.png";
 import Header from "../Header/Header";
+import { useNavigate } from "react-router-dom"; // For navigation
+import { emailValidator, passwordValidator } from "../Common/Validation";
 import CommonInputField from "../Common/CommonInputField";
+import CommonPasswordField from "../Common/CommonPasswordField";
 
 const { Title, Text, Link } = Typography;
 
 const LoginPage = () => {
-  const [activeTab, setActiveTab] = useState("candidate");
-  const [form] = Form.useForm();
   const [email, setEmail] = useState("");
-    const [emailError, setEmailError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [form] = Form.useForm();
 
-  const onFinish = async (values) => {
+  const [activeTab, setActiveTab] = useState("candidate");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
     setIsLoading(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      message.success(
-        `Welcome back, ${
-          activeTab === "candidate" ? "Candidate" : "Recruiter"
-        }!`
-      );
-      form.resetFields();
-    } catch (error) {
-      message.error("Login failed. Please try again.");
-    } finally {
-      setIsLoading(false);
+
+    const emailValidate = emailValidator(email);
+    const passwordValidate = passwordValidator(password);
+
+    if (emailValidate || passwordValidate) return;
+
+    if (activeTab === "candidate") {
+      console.log("candidate api");
+    } else {
+      console.log("recuiter api");
     }
+    navigate("/job-portal");
   };
 
   const tabItems = [
@@ -63,25 +70,24 @@ const LoginPage = () => {
     },
   ];
 
+  useEffect(() => {
+    setEmail("");
+  }, [activeTab]);
+
   return (
     <div className="loginpage_container">
       <Row>
         <Col span={12}>
           {" "}
           <div className="floating_circle1"></div>
-          <div className="login-animation">
+          <div style={{ height: 720 }} className="login-animation">
             <Card className="login_card" bordered={false}>
               <div style={{ textAlign: "center", marginBottom: 12 }}>
-                {/* <img
-                  className="career-fast-logo"
-                  src="https://workstatus.qubinex.com/static/media/logo-re-3.c9213a795657103d1ce1.png"
-                  alt="CareerFast Pro"
-                /> */}
                 <Title
                   level={2}
                   style={{ marginBottom: 8, fontWeight: 700, color: "#2d3748" }}
                 >
-                  Welcome to CareerFast
+                  Welcome to CareerFast!
                 </Title>
                 <Text type="secondary" style={{ fontSize: 16 }}>
                   Accelerate your{" "}
@@ -93,7 +99,15 @@ const LoginPage = () => {
 
               <Tabs
                 activeKey={activeTab}
-                onChange={setActiveTab}
+                onChange={(value) => {
+                  setActiveTab(value);
+                  console.log("valllllll", value);
+                  setEmail("");
+                  setEmailError("");
+                  setPassword("");
+                  setPasswordError("");
+                  form.resetFields();
+                }}
                 centered
                 size="large"
                 tabBarStyle={{ marginBottom: 32 }}
@@ -102,49 +116,47 @@ const LoginPage = () => {
 
               <Form
                 form={form}
-                name="login"
-                initialValues={{ remember: true }}
-                onFinish={onFinish}
+                className="login_form"
                 layout="vertical"
-                scrollToFirstError
+                onSubmitCapture={handleSubmit}
               >
-                <CommonInputField
-                  label="Email"
-                  name="email"
-                  mandotary={true}
-                  placeholder={"Enter your email"}
-                  type={"email"}
-                  value={email}
-                  // error={"lll"}
-                />
-
-                <Form.Item
-                  label={<span style={{ fontWeight: 500 }}>Password</span>}
-                  name="password"
-                  rules={[
-                    { required: true, message: "Please enter your password" },
-                    {
-                      min: 8,
-                      message: "Password must be at least 8 characters",
-                    },
-                  ]}
-                >
-                  <Input.Password
-                    prefix={
-                      <LockOutlined style={{ color: "rgba(0,0,0,.25)" }} />
-                    }
-                    placeholder="••••••••"
-                    size="large"
-                    className="premium-input"
+                <div style={{ marginBottom: "4px" }}>
+                  <CommonInputField
+                    label="Email"
+                    name="email"
+                    mandotary={true}
+                    placeholder="Enter your email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setEmailError(emailValidator(e.target.value));
+                    }}
+                    error={emailError}
                   />
-                </Form.Item>
+                </div>
+
+                <CommonPasswordField
+                  label="Password"
+                  name="password"
+                  placeholder="••••••••"
+                  prefix={<LockOutlined style={{ color: "rgba(0,0,0,.25)" }} />}
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setPasswordError(passwordValidator(e.target.value));
+                  }}
+                  error={passwordError}
+                  mandatory={true}
+                  min={8}
+                />
 
                 <div
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
-                    marginBottom: 24,
-                    marginTop: 30,
+                    marginBottom: 14,
+                    marginTop: 6,
                   }}
                 >
                   <Form.Item name="remember" noStyle>
@@ -185,7 +197,7 @@ const LoginPage = () => {
                     display: "flex",
                     justifyContent: "center",
                     gap: 16,
-                    marginBottom: 24,
+                    marginBottom: 14,
                   }}
                 >
                   <Button

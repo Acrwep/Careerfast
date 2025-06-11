@@ -17,6 +17,7 @@ import {
   DatePicker,
   Space,
   Spin,
+  Tag,
 } from "antd";
 import {
   UserOutlined,
@@ -38,6 +39,15 @@ import "../css/ProfileDetailsPage.css";
 import { MdDeleteForever } from "react-icons/md";
 import CommonInputField from "../Common/CommonInputField";
 import CommonSelectField from "../Common/CommonSelectField";
+import CommonTextArea from "../Common/CommonTextArea";
+import {
+  countryValidator,
+  emailValidator,
+  nameValidator,
+  pincodeValidator,
+  selectValidator,
+} from "../Common/Validation";
+import { phoneValidation } from "../Common/Validation";
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -48,19 +58,24 @@ const ProfileDetails = () => {
   const [form] = Form.useForm();
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(25);
+  const [fname, setFname] = useState("");
+  const [lname, setLname] = useState("");
   const [emailVerified, setEmailVerified] = useState("");
   const [email, setEmail] = useState("");
   const [numberVerified, setNumberVerified] = useState("");
   const [number, setNumber] = useState("");
+  const [pincode, setPincode] = useState("");
   const [profileImage, setProfileImage] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentlyWorking, setCurrentlyWorking] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [countryList, setCountryList] = useState([]);
+  const [countryId, setCountryId] = useState(null);
+  const [stateId, setStateId] = useState(null);
+  const [countryIdError, setCountryIdError] = useState(null);
   const [stateList, setStateList] = useState([]);
   const [cityList, setCityList] = useState([]);
-  const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedState, setSelectedState] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [experienceType, setExperienceType] = useState(null);
@@ -74,6 +89,17 @@ const ProfileDetails = () => {
   const recaptchaContainerRef = useRef(null);
   const [recaptchaVerifier, setRecaptchaVerifier] = useState(null);
   const [recaptchaInitAttempts, setRecaptchaInitAttempts] = useState(0);
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [customSkill, setCustomSkill] = useState("");
+
+  // errors
+  const fnameError = nameValidator(fname);
+  const lnameError = nameValidator(lname);
+  const emailError = emailValidator(email);
+  const numberError = phoneValidation(number);
+  const pincodeError = pincodeValidator(pincode);
+  const countryError = selectValidator(countryId);
+  const stateError = selectValidator(stateId);
 
   const initializeRecaptcha = useCallback(async () => {
     try {
@@ -167,11 +193,14 @@ const ProfileDetails = () => {
 
   const handleCountryChange = (countryCode) => {
     const country = countryList.find((c) => c.isoCode === countryCode);
-    setSelectedCountry(country);
+    setCountryId(country);
     setSelectedState(null);
     setSelectedCity(null);
-    setStateList(State.getStatesOfCountry(countryCode));
-    setCityList([]);
+
+    const states = State.getStatesOfCountry(countryCode);
+    setStateList(states);
+    setCityList([]); // Clear city list
+
     form.setFieldsValue({
       country: countryCode,
       state: undefined,
@@ -183,12 +212,16 @@ const ProfileDetails = () => {
     const state = stateList.find((s) => s.name === stateName);
     setSelectedState(state);
     form.setFieldsValue({ state: stateName, city: undefined });
-    if (selectedCountry && state) {
-      const cities = City.getCitiesOfState(
-        selectedCountry.isoCode,
-        state.isoCode
-      );
-      setCityList(cities);
+
+    if (countryId && state) {
+      const cities = City.getCitiesOfState(countryId.isoCode, state.isoCode);
+
+      const cityOptions = cities.map((city) => ({
+        label: city.name,
+        value: city.name,
+      }));
+
+      setCityList(cityOptions);
       setSelectedCity(null);
     }
   };
@@ -197,7 +230,6 @@ const ProfileDetails = () => {
     setSelectedCity(cityName);
     form.setFieldsValue({ city: cityName });
   };
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -319,42 +351,27 @@ const ProfileDetails = () => {
     }
   };
 
-  const nextStep = async () => {
-    // try {
-    //   await form.validateFields();
+  const nextStep = (e) => {
+    e.preventDefault();
 
-    const validateEmail = (email) => {
-      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return re.test(String(email).toLowerCase());
-    };
+    // Run validators again
+    const fnameErr = nameValidator(fname);
+    const lnameErr = nameValidator(lname);
+    const emailErr = emailValidator(email);
+    const phoneErr = phoneValidation(number);
+    const pinErr = pincodeValidator(pincode);
+    const countryErr = selectValidator(countryId);
 
-    const validateNumber = (number) => {
-      const phoneRegex = /^[6-9]\d{9}$/;
-      return phoneRegex.test(number);
-    };
-
-    const emailValue = form.getFieldValue("email");
-    if (emailValue && validateEmail(emailValue)) {
-      setEmailVerified("Verified");
-    } else {
-      setEmailVerified("Not Verified");
-    }
-
-    const numberValue = form.getFieldValue("number");
-    if (numberValue && validateNumber(numberValue)) {
-      setNumberVerified("Pending Verification");
-    } else {
-      setNumberVerified("Not Verified");
+    // If any error exists, prevent going to next step
+    if (fnameErr || lnameErr || emailErr || phoneErr || pinErr || countryErr) {
+      message.error("Please fill all fields correctly before proceeding.");
+      return;
     }
 
     if (currentStep < stepItems.length - 1) {
       setCurrentStep(currentStep + 1);
       setProgress(progress + 25);
     }
-    // } catch (error) {
-    //   console.error("Validation failed:", error);
-    //   message.error("Please fill in all required fields correctly");
-    // }
   };
 
   const prevStep = () => {
@@ -395,6 +412,20 @@ const ProfileDetails = () => {
     setCompanies(data);
   };
   //
+
+  const handleRemoveSkill = (skillToRemove) => {
+    setSelectedSkills(
+      selectedSkills.filter((skill) => skill !== skillToRemove)
+    );
+  };
+
+  const handleCustomSkillAdd = () => {
+    const trimmed = customSkill.trim();
+    if (trimmed && !selectedSkills.includes(trimmed)) {
+      setSelectedSkills([...selectedSkills, trimmed]);
+      setCustomSkill("");
+    }
+  };
 
   const stepItems = [
     {
@@ -452,7 +483,8 @@ const ProfileDetails = () => {
                     mandotary={true}
                     placeholder={"Enter your first name"}
                     type={"text"}
-                    // error={"Please Enter your first name"}
+                    onChange={(e) => setFname(e.target.value)}
+                    error={fnameError}
                   />
                 </div>
                 <div className="form-group">
@@ -462,7 +494,8 @@ const ProfileDetails = () => {
                     mandotary={true}
                     placeholder={"Enter your last name"}
                     type={"text"}
-                    // error={"Please Enter your last name"}
+                    onChange={(e) => setLname(e.target.value)}
+                    error={lnameError}
                   />
                 </div>
               </div>
@@ -474,7 +507,7 @@ const ProfileDetails = () => {
                   placeholder={"Enter your email"}
                   type={"email"}
                   onChange={(e) => setEmail(e.target.value)}
-                  // error={"Please Enter your email"}
+                  error={emailError}
                 />
               </div>
               <div className="form-group">
@@ -484,8 +517,8 @@ const ProfileDetails = () => {
                   mandotary={true}
                   placeholder={"Enter your phone number"}
                   type={"tel"}
-                  pattern={/^[6-9]\d{9}$/}
-                  // error={"Please enter your phone number"}
+                  onChange={(e) => setNumber(e.target.value)}
+                  error={numberError}
                 />
               </div>
               <div className="form-row">
@@ -495,53 +528,35 @@ const ProfileDetails = () => {
                     name="country"
                     mandatory={true}
                     placeholder="Select Country"
-                    options={countryList}
-                    onChange={handleCountryChange}
+                    options={countryList.map((country) => ({
+                      label: country.name,
+                      value: country.isoCode,
+                    }))}
                     showSearch={true}
+                    error={countryError}
+                    onChange={(value) => {
+                      handleCountryChange(value);
+                    }}
                   />
                 </div>
                 <div className="form-group">
                   <CommonSelectField
                     label="State"
                     name="state"
-                    disabled={!selectedCountry}
+                    disabled={!countryId}
                     mandatory={true}
                     placeholder="Select State"
-                    options={stateList}
+                    options={stateList.map((state) => ({
+                      label: state.name,
+                      value: state.name,
+                    }))}
                     onChange={handleStateChange}
                     showSearch={true}
                   />
                 </div>
               </div>
 
-              {/* <Form.Item
-                    layout="vertical"
-                    label={<span style={{ fontWeight: 500 }}>City</span>}
-                    name="city"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please select your City",
-                      },
-                    ]}
-                  >
-                    <Select
-                      showSearch
-                      placeholder="Select City"
-                      optionFilterProp="children"
-                      disabled={!selectedState}
-                      className="premium-input"
-                      onChange={handleCityChange}
-                    >
-                      {cityList.map((city) => (
-                        <Select.Option key={city.name} value={city.name}>
-                          {city.name}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  </Form.Item> */}
-
-              <div className="form-row">
+              <div style={{ marginTop: 20 }} className="form-row">
                 <div className="form-group">
                   <CommonSelectField
                     label="City"
@@ -551,7 +566,6 @@ const ProfileDetails = () => {
                     options={cityList}
                     onChange={handleCityChange}
                     showSearch={true}
-                    // disabled={!selectedState}
                   />
                 </div>
 
@@ -562,27 +576,17 @@ const ProfileDetails = () => {
                     mandotary={true}
                     placeholder={"Enter your pincode"}
                     type={"number"}
-                    // error={"Please enter your pincode"}
+                    onChange={(e) => setPincode(e.target.value)}
+                    error={pincodeError}
                   />
                 </div>
               </div>
               <div className="form-group">
-                <Form.Item
-                  layout="vertical"
-                  label={<span style={{ fontWeight: 500 }}>Address</span>}
-                  name="address"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter your Address",
-                    },
-                  ]}
-                >
-                  <TextArea
-                    placeholder="Enter Your Address"
-                    className="premium-input"
-                  />
-                </Form.Item>
+                <CommonTextArea
+                  label={"Address"}
+                  // name={"address"}
+                  placeholder={"Enter Your Address"}
+                />
               </div>
             </div>
           </Card>
@@ -598,37 +602,6 @@ const ProfileDetails = () => {
           <Card className="premium-card">
             <div className="form-section">
               <div className="form-group">
-                {/* <Form.Item
-                  layout="vertical"
-                  label={
-                    <span style={{ fontWeight: 500 }}>
-                      Fresher / Experience
-                    </span>
-                  }
-                  name="experiencetype"
-                  rules={[
-                    { required: true, message: "Please enter your job title" },
-                  ]}
-                >
-                  <Select
-                    showSearch
-                    placeholder="Select Experience"
-                    optionFilterProp="label"
-                    className="premium-input"
-                    onChange={handleExperienceTypeChange}
-                    options={[
-                      {
-                        value: "Fresher",
-                        label: "Fresher",
-                      },
-                      {
-                        value: "Experience",
-                        label: "Experience",
-                      },
-                    ]}
-                  />
-                </Form.Item> */}
-
                 <CommonSelectField
                   label="Fresher / Experience"
                   name="fresherexperience"
@@ -712,63 +685,63 @@ const ProfileDetails = () => {
                     </div>
                     <div className="form-group">
                       <CommonSelectField
-                        label="Total Months gf Experience"
+                        label="Total Months of Experience"
                         name="experiencemonth"
                         mandatory={true}
                         placeholder="Select Experience"
                         options={[
-                                                      {
-                              value: "0 Month",
-                              label: "0 Month",
-                            },
-                            {
-                              value: "1 Month",
-                              label: "1 Month",
-                            },
-                            {
-                              value: "2 Months",
-                              label: "2 Months",
-                            },
-                            {
-                              value: "3 Months",
-                              label: "3 Months",
-                            },
-                            {
-                              value: "4 Months",
-                              label: "4 Months",
-                            },
-                            {
-                              value: "5 Months",
-                              label: "5 Months",
-                            },
-                            {
-                              value: "6 Months",
-                              label: "6 Months",
-                            },
-                            {
-                              value: "7 Months",
-                              label: "7 Months",
-                            },
-                            {
-                              value: "8 Months",
-                              label: "8 Months",
-                            },
-                            {
-                              value: "9 Months",
-                              label: "9 Months",
-                            },
-                            {
-                              value: "10 Months",
-                              label: "10 Months",
-                            },
-                            {
-                              value: "11 Months",
-                              label: "11 Months",
-                            },
-                            {
-                              value: "12 Months",
-                              label: "12 Months",
-                            },
+                          {
+                            value: "0 Month",
+                            label: "0 Month",
+                          },
+                          {
+                            value: "1 Month",
+                            label: "1 Month",
+                          },
+                          {
+                            value: "2 Months",
+                            label: "2 Months",
+                          },
+                          {
+                            value: "3 Months",
+                            label: "3 Months",
+                          },
+                          {
+                            value: "4 Months",
+                            label: "4 Months",
+                          },
+                          {
+                            value: "5 Months",
+                            label: "5 Months",
+                          },
+                          {
+                            value: "6 Months",
+                            label: "6 Months",
+                          },
+                          {
+                            value: "7 Months",
+                            label: "7 Months",
+                          },
+                          {
+                            value: "8 Months",
+                            label: "8 Months",
+                          },
+                          {
+                            value: "9 Months",
+                            label: "9 Months",
+                          },
+                          {
+                            value: "10 Months",
+                            label: "10 Months",
+                          },
+                          {
+                            value: "11 Months",
+                            label: "11 Months",
+                          },
+                          {
+                            value: "12 Months",
+                            label: "12 Months",
+                          },
                         ]}
                         showSearch={true}
                       />
@@ -861,7 +834,10 @@ const ProfileDetails = () => {
                           </Form.Item>
                         </div>
                       </div>
-                      <div className="professional-checkbox">
+                      <div
+                        style={{ marginTop: 15 }}
+                        className="professional-checkbox"
+                      >
                         <Checkbox
                           checked={company.currentlyWorking}
                           onChange={(e) => handleCheckboxChange(index, e)}
@@ -884,22 +860,39 @@ const ProfileDetails = () => {
               )}
 
               <div className="form-group">
-                <Form.Item
-                  layout="vertical"
-                  label={<span style={{ fontWeight: 500 }}>Skills</span>}
-                  name="skills"
-                  rules={[
-                    { required: true, message: "Please enter your Skills" },
-                  ]}
-                >
-                  <Select
-                    className="premium-input skills-select"
-                    mode="tags"
-                    placeholder="Enter your skills"
-                    open={false}
-                    suffixIcon={null}
-                  />
-                </Form.Item>
+                <div style={{ marginTop: 8, marginBottom: 0 }}>
+                  {selectedSkills.map((skill) => (
+                    <Tag
+                      key={skill}
+                      closable
+                      onClose={() => handleRemoveSkill(skill)}
+                      style={{
+                        marginBottom: 15,
+                        fontSize: 14,
+                        padding: "5px 10px",
+                        border: "none",
+                        backgroundColor: "#e9e0fe",
+                        color: "#5f2eea",
+                        borderRadius: 50,
+                      }}
+                    >
+                      {skill}
+                    </Tag>
+                  ))}
+                </div>
+
+                <CommonInputField
+                  label={"Skills"}
+                  onPressEnter={handleCustomSkillAdd}
+                  value={customSkill}
+                  name={"Job title"}
+                  onChange={(e) => setCustomSkill(e.target.value)}
+                  mandotary={true}
+                  placeholder={
+                    "List your skills here, showcasing what you excel at."
+                  }
+                  // error={"Please enter your job title"}
+                />
               </div>
             </div>
           </Card>

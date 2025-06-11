@@ -53,6 +53,7 @@ import { style } from "framer-motion/client";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import CommonInputField from "../Common/CommonInputField";
+import CommonSelectField from "../Common/CommonSelectField";
 const { Option } = Select;
 const { Group: InputGroup } = Input;
 export default function PostJobs() {
@@ -513,16 +514,10 @@ export default function PostJobs() {
 
                 {work_location[workLocationActiveButton]?.name ===
                 "Specific Location" ? (
-                  <Select
+                  <CommonSelectField
                     style={{ marginTop: "20px" }}
-                    showSearch
-                    className="premium-input"
-                    placeholder="Select Location"
-                    filterOption={(input, option) =>
-                      (option?.label ?? "")
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
-                    }
+                    showSearch={true}
+                    placeholder={"Select Location"}
                     options={[
                       { value: "1", label: "Chennai" },
                       { value: "2", label: "Mumbai" },
@@ -553,17 +548,9 @@ export default function PostJobs() {
                 populate additional data & enhance the visibility of your job
                 listing for potential candidates.
               </Text>
-              <Select
-                name="job_category"
-                style={{ marginTop: "10px" }}
-                showSearch
-                className="premium-input"
-                placeholder="Select Category Name"
-                filterOption={(input, option) =>
-                  (option?.label ?? "")
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
+              <CommonSelectField
+                showSearch={true}
+                placeholder={"Select Location"}
                 options={[
                   { value: "1", label: "Chennai" },
                   { value: "2", label: "Mumbai" },
@@ -572,38 +559,18 @@ export default function PostJobs() {
               />
             </Form.Item>
 
-            <Form.Item
-              layout="vertical"
-              label={<span style={{ fontWeight: 500 }}>Skills Required</span>}
-              name="skill_required"
-              rules={[
-                {
-                  required: true,
-                  message: "Select your Skills",
-                },
+            <CommonSelectField
+              label={"Skills Required"}
+              mandatory={true}
+              name={"skill_required"}
+              showSearch={true}
+              placeholder={"Select Location"}
+              options={[
+                { value: "1", label: "Chennai" },
+                { value: "2", label: "Mumbai" },
+                { value: "3", label: "Bangalore" },
               ]}
-            >
-              <Text>
-                Skills candidates should have or skills that are preferred
-              </Text>
-              <Select
-                name="skill_required"
-                style={{ marginTop: "10px" }}
-                showSearch
-                className="premium-input"
-                placeholder="Search Skills"
-                filterOption={(input, option) =>
-                  (option?.label ?? "")
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
-                options={[
-                  { value: "1", label: "Chennai" },
-                  { value: "2", label: "Mumbai" },
-                  { value: "3", label: "Bangalore" },
-                ]}
-              />
-            </Form.Item>
+            />
           </div>
 
           <div className="eligibility">

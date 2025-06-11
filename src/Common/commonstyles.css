@@ -1,0 +1,23 @@
+.commoninputfield {
+  position: relative;
+}
+.show-premium-input-error {
+  /* position: absolute; */
+  transform: translateX(0px);
+  opacity: 1;
+  transition: all 0.3s ease-in-out;
+}
+.hide-premium-input-error {
+  /* position: absolute; */
+  transform: translateX(-26px);
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.hide-premium-input-error p {
+  margin-bottom: 0px !important;
+}
+
+.show-premium-input-error p {
+  margin-bottom: 0px !important;
+}

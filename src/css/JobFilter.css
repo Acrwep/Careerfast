@@ -65,6 +65,9 @@ a {
 .apply_now {
   background: linear-gradient(135deg, #7f5af0 0%, #5f2eea 100%);
 }
+.apply_now:hover {
+  background: linear-gradient(135deg, #7f5af0 0%, #5f2eea 100%) !important;
+}
 
 .job_skills {
   border-radius: 4px;
@@ -156,8 +159,13 @@ a {
 }
 
 .job_filter .apply-button:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(79, 70, 229, 0.25);
+}
+
+.job-filter-topbar .ant-form-item-label {
+  display: none;
 }
 
 .job_filter .section-card {
@@ -486,11 +494,36 @@ a {
 
 .premium-job-details .quick_apply button {
   border: none;
-  background: #6a5cff;
+  background: linear-gradient(
+    135deg,
+    #7f5af0 0%,
+    #5f2eea 50%,
+    #4b1ea0 100%
+  ) !important;
   color: #fff;
   padding: 10px 20px;
   border-radius: 10px;
   font-size: 16px;
+  transition: 0.3s all;
+}
+
+.job-filter-commonselect .ant-form-item-label {
+  display: none;
+}
+
+.job-filter-job {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border: "none";
+  padding: "0 20px";
+  height: 36;
+}
+
+.job-filter-job:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+}
+
+.premium-job-details .quick_apply button:hover {
+  transform: translateY(-3px);
 }
 
 .premium-job-details .job_card {
@@ -774,8 +807,9 @@ a {
 .reviews-tab .card-header {
   margin-bottom: 24px;
   position: relative;
-  padding-bottom: 16px;
+  padding-bottom: 1px;
   text-align: justify;
+  align-items: center;
 }
 
 .reviews-tab .card-header::after {

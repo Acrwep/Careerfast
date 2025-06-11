@@ -1,284 +1,364 @@
 import React, { useState } from "react";
-import "../css/RegisterPage.css";
-import { FcGoogle } from "react-icons/fc";
-import { Input } from "antd";
-
 import {
-  FiUser,
-  FiPhone,
-  FiMail,
-  FiLock,
-  FiBriefcase,
-  FiHome,
-} from "react-icons/fi";
+  Tabs,
+  Form,
+  Input,
+  Button,
+  Checkbox,
+  Typography,
+  Card,
+  Divider,
+  message,
+  Col,
+  Row,
+} from "antd";
 import {
-  nameValidation,
+  LockOutlined,
+  MailOutlined,
+  UserOutlined,
+  PhoneOutlined,
+  HomeOutlined,
+  SolutionOutlined,
+} from "@ant-design/icons";
+import "../css/LoginPage.css";
+import loginImage from "../images/login_image.png";
+import { useNavigate } from "react-router-dom";
+import {
+  nameValidator,
+  emailValidator,
+  passwordValidator,
   phoneValidation,
-  emailValidation,
-  passwordValidation,
   confirmPasswordValidation,
   orgNameValidation,
   orgTypeValidation,
 } from "../Common/Validation";
+import CommonInputField from "../Common/CommonInputField";
+import CommonPasswordField from "../Common/CommonPasswordField";
 
-export default function Register() {
-  const [name, setName] = useState("");
-  const [nameError, setNameError] = useState("");
-  const [phone, setPhone] = useState("");
-  const [phoneError, setPhoneError] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [confirmPasswordError, setConfirmPasswordError] = useState("");
-  const [orgName, setorgName] = useState("");
-  const [orgNameError, setorgNameError] = useState("");
-  const [orgType, setorgType] = useState("");
-  const [orgTypeError, setorgTypeError] = useState("");
-  const [role, setRole] = useState("candidate");
+const { Title, Text, Link } = Typography;
+
+const RegisterPage = () => {
+  const [activeTab, setActiveTab] = useState("candidate");
   const [formData, setFormData] = useState({
-    fullName: "",
-    mobile: "",
+    name: "",
+    phone: "",
     email: "",
     password: "",
-    gender: "",
     confirmPassword: "",
     orgName: "",
     orgType: "",
   });
+  const [errors, setErrors] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    orgName: "",
+    orgType: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    setRole(e.target.value);
+  const handleInputChange = (field, value) => {
+    let validator;
+    switch (field) {
+      case "name":
+        validator = nameValidator;
+        break;
+      case "phone":
+        validator = phoneValidation;
+        break;
+      case "email":
+        validator = emailValidator;
+        break;
+      case "password":
+        validator = passwordValidator;
+        break;
+      case "confirmPassword":
+        validator = (val) => confirmPasswordValidation(formData.password, val);
+        break;
+      case "orgName":
+        validator = orgNameValidation;
+        break;
+      case "orgType":
+        validator = orgTypeValidation;
+        break;
+      default:
+        validator = () => "";
+    }
+
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: validator(value) }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    const nameErr = nameValidation(name);
-    const phoneErr = phoneValidation(phone);
-    const emailErr = emailValidation(email);
-    const passwordErr = passwordValidation(password);
-    const cofirmpasswordErr = passwordValidation(password);
-    const orgNameErr = orgNameValidation(orgName);
-    const orgTypeErr = orgTypeValidation(orgType);
+    // Validate all fields
+    const newErrors = {
+      name: nameValidator(formData.name),
+      phone: phoneValidation(formData.phone),
+      email: emailValidator(formData.email),
+      password: passwordValidator(formData.password),
+      confirmPassword: confirmPasswordValidation(
+        formData.password,
+        formData.confirmPassword
+      ),
+      orgName:
+        activeTab === "recruiter" ? orgNameValidation(formData.orgName) : "",
+      orgType:
+        activeTab === "recruiter" ? orgTypeValidation(formData.orgType) : "",
+    };
 
-    setNameError(nameErr);
-    setPhoneError(phoneErr);
-    setEmailError(emailErr);
-    setPasswordError(passwordErr);
-    setConfirmPasswordError(cofirmpasswordErr);
-    setorgNameError(orgNameErr);
-    setorgTypeError(orgTypeErr);
+    setErrors(newErrors);
 
-    if (
-      nameErr ||
-      phoneErr ||
-      emailErr ||
-      passwordErr ||
-      cofirmpasswordErr ||
-      orgNameErr ||
-      orgTypeErr
-    )
+    const hasErrors = Object.values(newErrors).some((error) => error !== "");
+    if (hasErrors) {
+      setIsLoading(false);
       return;
+    }
+
+    setTimeout(() => {
+      setIsLoading(false);
+      message.success("Registration successful!");
+      navigate("/login");
+    }, 3000);
   };
 
+  const tabItems = [
+    {
+      key: "candidate",
+      label: (
+        <span className="tab-label" style={{ padding: "0 24px" }}>
+          Candidate Registration
+        </span>
+      ),
+    },
+    {
+      key: "recruiter",
+      label: (
+        <span className="tab-label" style={{ padding: "0 24px" }}>
+          Recruiter Registration
+        </span>
+      ),
+    },
+  ];
+
   return (
-    <div className="premium-register-container">
-      <div className="premium-register-card">
-        <div className="premium-register-header">
-          <h2 onClick={() => console.log(name, nameError)}>
-            Create Your Account
-          </h2>
-          <p>Join us today and unlock amazing opportunities</p>
-        </div>
-
-        <div className="premium-role-switcher">
-          <button
-            className={`premium-role-btn ${
-              role === "candidate" ? "active" : ""
-            }`}
-            onClick={() => setRole("candidate")}
-          >
-            <FiUser className="role-icon" />
-            <span>Candidate</span>
-          </button>
-          <button
-            className={`premium-role-btn ${
-              role === "recruiter" ? "active" : ""
-            }`}
-            onClick={() => setRole("recruiter")}
-          >
-            <FiBriefcase className="role-icon" />
-            <span>Recruiter</span>
-          </button>
-        </div>
-
-        <button className="premium-google-btn">
-          <FcGoogle size={22} />
-          Continue with Google
-        </button>
-
-        <div className="premium-divider">
-          <span className="divider-line"></span>
-          <span className="divider-text">OR</span>
-          <span className="divider-line"></span>
-        </div>
-
-        <form className="premium-register-form">
-          <div className="premium-input-group">
-            <Input
-              className="register-input"
-              value={name}
-              size="large"
-              status={nameError ? "error" : ""}
-              placeholder="Enter your name"
-              prefix={<FiUser />}
-              onChange={(e) => {
-                setName(e.target.value);
-                setNameError(nameValidation(e.target.value));
-              }}
-            />
-            {nameError && <div className="error-message">{nameError}</div>}
-          </div>
-
-          <div className="premium-input-group">
-            <Input
-              className="register-input"
-              size="large"
-              placeholder="Mobile Number"
-              status={phoneError ? "error" : ""}
-              prefix={<FiPhone />}
-              value={phone}
-              onChange={(e) => {
-                setPhone(e.target.value);
-                setPhoneError(phoneValidation(e.target.value));
-              }}
-            />
-            {phoneError && <div className="error-message">{phoneError}</div>}
-          </div>
-
-          <div className="premium-input-group">
-            <Input
-              className="register-input"
-              size="large"
-              placeholder="Email ID"
-              status={emailError ? "error" : ""}
-              prefix={<FiMail />}
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setEmailError(emailValidation(e.target.value));
-              }}
-            />
-            {emailError && <div className="error-message">{emailError}</div>}
-          </div>
-
-          {role === "recruiter" && (
-            <>
-              <div className="premium-input-group">
-                <Input
-                  type="text"
-                  name="orgName"
-                  className="register-input"
-                  value={orgName}
-                  size="large"
-                  placeholder="Organization Name"
-                  prefix={<FiBriefcase />}
-                  status={orgNameError ? "error" : ""}
-                  onChange={(e) => {
-                    setorgName(e.target.value);
-                    setorgNameError(orgNameValidation(e.target.value));
-                  }}
-                />
-                {orgNameError && (
-                  <div className="error-message">{orgNameError}</div>
-                )}
+    <div className="loginpage_container">
+      <Row>
+        <Col span={12}>
+          {" "}
+          <div className="floating_circle1"></div>
+          <div style={{ height: 870 }} className="login-animation">
+            <Card className="login_card" bordered={false}>
+              <div style={{ textAlign: "center", marginBottom: 12 }}>
+                <Title
+                  level={2}
+                  style={{ marginBottom: 8, fontWeight: 700, color: "#2d3748" }}
+                >
+                  Join CareerFast!
+                </Title>
+                <Text type="secondary" style={{ fontSize: 16 }}>
+                  {activeTab === "candidate"
+                    ? "Start your career journey with us"
+                    : "Find the best talent for your organization"}
+                </Text>
               </div>
-              <div className="premium-input-group">
-                <Input
-                  type="text"
-                  className="register-input"
-                  name="orgType"
-                  value={orgType}
-                  size="large"
-                  status={orgTypeError ? "error" : ''}
-                  placeholder="Organization Type"
-                  prefix={<FiHome />}
-                  onChange={(e) => {
-                    setorgType(e.target.value);
-                    setorgTypeError(orgTypeValidation(e.target.value));
-                  }}
-                />
-                {orgTypeError && (
-                  <div className="error-message">{orgTypeError}</div>
+
+              <Tabs
+                activeKey={activeTab}
+                onChange={setActiveTab}
+                centered
+                size="large"
+                tabBarStyle={{ marginBottom: 32 }}
+                items={tabItems}
+              />
+
+              <Form
+                className="login_form"
+                layout="vertical"
+                onSubmitCapture={handleSubmit}
+              >
+                <div style={{ marginBottom: "0px" }}>
+                  <CommonInputField
+                    label="Full Name"
+                    name="name"
+                    mandotary={true}
+                    placeholder="Enter your full name"
+                    prefix={
+                      <UserOutlined style={{ color: "rgba(0, 0, 0, 0.25)" }} />
+                    }
+                    value={formData.name}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
+                    error={errors.name}
+                  />
+                </div>
+
+                <div style={{ marginBottom: "0px" }}>
+                  <CommonInputField
+                    label="Phone Number"
+                    name="phone"
+                    mandotary={true}
+                    placeholder="Enter your phone number"
+                    prefix={
+                      <PhoneOutlined style={{ color: "rgba(0, 0, 0, 0.25)" }} />
+                    }
+                    value={formData.phone}
+                    onChange={(e) => handleInputChange("phone", e.target.value)}
+                    error={errors.phone}
+                  />
+                </div>
+
+                <div style={{ marginBottom: "0px" }}>
+                  <CommonInputField
+                    label="Email"
+                    name="email"
+                    mandotary={true}
+                    placeholder="Enter your email"
+                    prefix={
+                      <MailOutlined style={{ color: "rgba(0, 0, 0, 0.25)" }} />
+                    }
+                    value={formData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    error={errors.email}
+                  />
+                </div>
+
+                {activeTab === "recruiter" && (
+                  <>
+                    <div className="form-row">
+                      <div style={{ marginBottom: "0px" }}>
+                        <CommonInputField
+                          label="Organization Name"
+                          name="orgName"
+                          mandotary={true}
+                          placeholder="Enter your organization name"
+                          prefix={
+                            <HomeOutlined
+                              style={{ color: "rgba(0, 0, 0, 0.25)" }}
+                            />
+                          }
+                          value={formData.orgName}
+                          onChange={(e) =>
+                            handleInputChange("orgName", e.target.value)
+                          }
+                          error={errors.orgName}
+                        />
+                      </div>
+                      <div style={{ marginBottom: "0px" }}>
+                        <CommonInputField
+                          label="Organization Type"
+                          name="orgType"
+                          mandotary={true}
+                          placeholder="E.g., IT, Healthcare, Finance"
+                          prefix={
+                            <SolutionOutlined
+                              style={{ color: "rgba(0, 0, 0, 0.25)" }}
+                            />
+                          }
+                          value={formData.orgType}
+                          onChange={(e) =>
+                            handleInputChange("orgType", e.target.value)
+                          }
+                          error={errors.orgType}
+                        />
+                      </div>
+                    </div>
+                  </>
                 )}
-              </div>
-            </>
-          )}
+                <div className="form-row">
+                  <div style={{ marginBottom: "0px" }}>
+                    <CommonPasswordField
+                      label="Password"
+                      name="password"
+                      placeholder="••••••••"
+                      prefix={
+                        <LockOutlined style={{ color: "rgba(0,0,0,.25)" }} />
+                      }
+                      value={formData.password}
+                      onChange={(e) =>
+                        handleInputChange("password", e.target.value)
+                      }
+                      error={errors.password}
+                      mandatory={true}
+                      min={8}
+                    />
+                  </div>
 
-          <div className="premium-input-group">
-            <Input.Password
-              size="large"
-              className="register-input"
-              placeholder="Password"
-              prefix={<FiLock />}
-              status={passwordError ? "error" : ""}
-              value={password}
-              onChange={(e) => {
-                const val = e.target.value;
-                setPassword(val);
-                setPasswordError(passwordValidation(val));
-                if (confirmPassword) {
-                  setConfirmPasswordError(
-                    confirmPasswordValidation(val, confirmPassword)
-                  );
-                }
-              }}
-            />
-            {passwordError && (
-              <div className="error-message">{passwordError}</div>
-            )}
+                  <div style={{ marginBottom: "0px" }}>
+                    <CommonPasswordField
+                      label="Confirm Password"
+                      name="confirmPassword"
+                      placeholder="••••••••"
+                      prefix={
+                        <LockOutlined style={{ color: "rgba(0,0,0,.25)" }} />
+                      }
+                      value={formData.confirmPassword}
+                      onChange={(e) =>
+                        handleInputChange("confirmPassword", e.target.value)
+                      }
+                      error={errors.confirmPassword}
+                      mandatory={true}
+                      min={8}
+                    />
+                  </div>
+                </div>
+
+                {/* <div style={{ marginBottom: 14, marginTop: 30 }}>
+                  <Form.Item name="terms" valuePropName="checked">
+                    <Checkbox style={{ fontWeight: 500 }}>
+                      I agree to the <Link href="#">Terms of Service</Link> and{" "}
+                      <Link href="#">Privacy Policy</Link>
+                    </Checkbox>
+                  </Form.Item>
+                </div> */}
+
+                <Form.Item>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    block
+                    size="large"
+                    loading={isLoading}
+                    className="premium-button"
+                  >
+                    {isLoading
+                      ? "Registering..."
+                      : `Create ${
+                          activeTab === "candidate" ? "Candidate" : "Recruiter"
+                        } Account`}
+                  </Button>
+                </Form.Item>
+                <div style={{ textAlign: "center", marginTop: 20 }}>
+                  <Text type="secondary" style={{ fontSize: 15 }}>
+                    Already have an account? 
+                    <Link
+                      href="/login"
+                      style={{ color: "#8d3ffb", fontWeight: 600 }}
+                      className="hover-underline"
+                    >
+                       Sign in now
+                    </Link>
+                  </Text>
+                </div>
+              </Form>
+            </Card>
           </div>
+        </Col>
 
-          <div className="premium-input-group">
-            <Input.Password
-              size="large"
-              className="register-input"
-              placeholder="Confirm Password"
-              prefix={<FiLock />}
-              value={confirmPassword}
-              status={confirmPasswordError ? "error" : ""}
-              onChange={(e) => {
-                const val = e.target.value;
-                setConfirmPassword(val);
-                setConfirmPasswordError(
-                  confirmPasswordValidation(password, val)
-                );
-              }}
-            />
-            {confirmPasswordError && (
-              <div className="error-message">{confirmPasswordError}</div>
-            )}
+        <Col span={12}>
+          {" "}
+          <div style={{ height: 870 }} className="login_image">
+            <img src={loginImage} alt="Registration illustration"></img>
           </div>
-
-          <button
-            type="submit"
-            className="premium-submit-btn"
-            onClick={handleSubmit}
-          >
-            Create Account
-          </button>
-        </form>
-
-        <div className="premium-login-link">
-          Already have an account?{" "}
-          <a href="/login" className="premium-login-anchor">
-            Sign In
-          </a>
-        </div>
-      </div>
+          <div className="floating_circle2"></div>
+        </Col>
+      </Row>
     </div>
   );
-}
+};
+
+export default RegisterPage;
